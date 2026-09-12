@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API Filtering</title>
+</head>
+<body>
+    <h1>Test API Filtering</h1>
+    <div id="results"></div>
+
+    <script>
+        async function testAPI() {
+            const resultsDiv = document.getElementById('results');
+            
+            try {
+                // Test the old way (query parameter)
+                console.log('Testing old way: /api/schools?type=ecd');
+                const oldResponse = await fetch('http://localhost:8000/api/schools?type=ecd');
+                const oldData = await oldResponse.json();
+                console.log('Old way result:', oldData);
+                
+                resultsDiv.innerHTML += '<h2>Old Way (Query Parameter):</h2>';
+                resultsDiv.innerHTML += '<p>URL: /api/schools?type=ecd</p>';
+                resultsDiv.innerHTML += '<p>Count: ' + oldData.length + '</p>';
+                resultsDiv.innerHTML += '<pre>' + JSON.stringify(oldData, null, 2) + '</pre>';
+                
+                // Test the new way (path parameter)
+                console.log('Testing new way: /api/schools/by-type/ecd');
+                const newResponse = await fetch('http://localhost:8000/api/schools/by-type/ecd');
+                const newData = await newResponse.json();
+                console.log('New way result:', newData);
+                
+                resultsDiv.innerHTML += '<h2>New Way (Path Parameter):</h2>';
+                resultsDiv.innerHTML += '<p>URL: /api/schools/by-type/ecd</p>';
+                resultsDiv.innerHTML += '<p>Count: ' + newData.length + '</p>';
+                resultsDiv.innerHTML += '<pre>' + JSON.stringify(newData, null, 2) + '</pre>';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                resultsDiv.innerHTML += '<p style="color: red;">Error: ' + error.message + '</p>';
+            }
+        }
+        
+        testAPI();
+    </script>
+</body>
+</html>
+
+
+
