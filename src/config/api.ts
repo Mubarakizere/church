@@ -47,6 +47,8 @@ export const apiConfig = {
     uploadImages: '/upload/images',
     gallery: '/gallery',
     secureDocuments: '/secure-documents',
+    donations: '/donations',
+    donationsStatistics: '/donations/statistics',
     // Admin
     admin: {
       heroImages: '/admin/hero-images',
@@ -119,6 +121,10 @@ export const apiUrls = {
   secureDocumentVerifyPassword: (id: number) => buildApiUrl(`${apiConfig.endpoints.secureDocuments}/${id}/verify-password`),
   secureDocumentCheckAccess: (id: number) => buildApiUrl(`${apiConfig.endpoints.secureDocuments}/${id}/check-access`),
 
+  // Donations
+  donations: () => buildApiUrl(apiConfig.endpoints.donations),
+  donationsStatistics: () => buildApiUrl(apiConfig.endpoints.donationsStatistics),
+
   // Admin URLs
   admin: {
     heroImages: () => buildApiUrl(apiConfig.endpoints.admin.heroImages),
@@ -133,7 +139,10 @@ export const apiUrls = {
     secureDocumentToggleDownload: (id: number) => buildApiUrl(`${apiConfig.endpoints.admin.secureDocuments}/${id}/toggle-download`),
     changePassword: () => buildApiUrl(apiConfig.endpoints.admin.changePassword),
     users: () => buildApiUrl(apiConfig.endpoints.admin.users),
+    analytics: () => buildApiUrl('/admin/analytics'),
   },
+
+  trackVisit: () => buildApiUrl('/track-visit'),
 
   // Storage URLs
   storage: (path: string) => buildStorageUrl(path),

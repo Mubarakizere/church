@@ -57,18 +57,18 @@ class UpdatePartnerUrls extends Command
             }
 
             if ($updated) {
-                $this->line("✅ Updated {$partner->name}:");
+                $this->line("Updated {$partner->name}:");
                 $this->line("   From: {$oldLogo}");
                 $this->line("   To:   {$partner->logo}");
             } else {
-                $this->line("⏭️  Skipped {$partner->name} (already correct)");
+                $this->line("Skipped {$partner->name} (already correct)");
             }
         }
 
         $this->info("Updated {$count} partner logo URLs.");
 
         if ($count > 0) {
-            $this->info('✨ Partner URLs have been updated to use the current APP_URL configuration.');
+            $this->info('Partner URLs have been updated to use the current APP_URL configuration.');
         }
 
         return 0;

@@ -1,15 +1,24 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Newspaper, Calendar, User, Share2, ArrowLeft } from "lucide-react";
-import { apiUrls } from "@/config/api";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { 
+  Newspaper, 
+  Calendar, 
+  User, 
+  Share2, 
+  ArrowLeft, 
+  ChevronRight, 
+  Printer,
+  Check,
+  Building2,
+  Clock
+} from "lucide-react";
+import { apiUrls } from "@/config/api";
 import { toast } from "sonner";
 
-interface News {
+interface NewsItem {
   id: number;
   title: string;
   slug: string;
@@ -25,44 +34,62 @@ interface News {
   updated_at: string;
 }
 
-const NewsDetail = () => {
+const resolveNewsImageUrl = (imagePath?: string) => {
+  if (!imagePath) return "/placeholder.svg";
+  if (imagePath.startsWith("http")) return imagePath;
+  const clean = imagePath.replace(/^\/+/, "").replace(/^storage\//, "");
+  return apiUrls.storage(clean);
+};
+
+const formatDate = (dateString?: string) => {
+  if (!dateString) return "";
+  try {
+    const d = new Date(dateString);
+    if (isNaN(d.getTime())) return "";
+    return d.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
+  } catch {
+    return "";
+  }
+};
+
+export default function NewsDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const [news, setNews] = useState<News | null>(null);
+  const [news, setNews] = useState<NewsItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const fetchNews = async () => {
       try {
         setLoading(true);
         setError(null);
-        
+
         if (!slug) {
-          setError('Invalid news article');
+          setError("Invalid news article");
           return;
         }
 
         const response = await fetch(apiUrls.newsItem(slug));
-        
+
         if (response.ok) {
           const data = await response.json();
-          console.log('News article data:', data); // Debug log
           if (data.success && data.data) {
-            console.log('News images:', data.data.images); // Debug log
-            console.log('News image:', data.data.image); // Debug log
             setNews(data.data);
           } else {
-            setError('News article not found');
+            setError("News article not found");
           }
-        } else if (response.status === 404) {
-          setError('News article not found');
         } else {
-          setError('Failed to load news article');
+          setError("News article not found");
         }
-      } catch (error) {
-        console.error('Error fetching news:', error);
-        setError('An error occurred while loading the news article');
+      } catch (err) {
+        console.error("Error fetching news:", err);
+        setError("An error occurred while loading the news article");
       } finally {
         setLoading(false);
       }
@@ -71,287 +98,263 @@ const NewsDetail = () => {
     fetchNews();
   }, [slug]);
 
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    toast.success("Article link copied to clipboard");
+    setTimeout(() => setCopied(false), 2500);
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background to-church-red/5 flex items-center justify-center">
-        <div className="flex items-center space-x-3">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-church-red"></div>
-          <span className="text-lg text-muted-foreground">Loading news article...</span>
-        </div>
+      <div className="min-h-screen bg-white flex flex-col font-sans">
+        <Header />
+        <main className="flex-grow flex items-center justify-center py-24">
+          <div className="text-center">
+            <div className="w-10 h-10 border-3 border-church-gold border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-sm font-semibold text-slate-500">Loading article...</p>
+          </div>
+        </main>
+        <Footer />
       </div>
     );
   }
 
   if (error || !news) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-white flex flex-col font-sans">
         <Header />
-        <div className="pt-20 min-h-screen bg-gradient-to-br from-background to-church-red/5 flex items-center justify-center">
-          <div className="text-center">
-            <Newspaper className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-foreground mb-4">News Article Not Found</h1>
-            <p className="text-muted-foreground mb-6">{error}</p>
-            <Button onClick={() => navigate('/news')} variant="elegant">
+        <main className="flex-grow flex items-center justify-center py-24">
+          <div className="text-center max-w-md mx-auto px-4">
+            <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-4 text-slate-400">
+              <Newspaper className="h-7 w-7" />
+            </div>
+            <h1 className="text-2xl font-serif font-bold text-church-navy mb-2">
+              Article Not Found
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 mb-6">
+              The article you are looking for may have been moved or is no longer accessible.
+            </p>
+            <Button
+              onClick={() => navigate("/news")}
+              className="bg-church-navy hover:bg-church-navy/90 text-white text-xs font-bold px-6 py-2 rounded-xl"
+            >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to News
+              Return to News Directory
             </Button>
           </div>
-        </div>
+        </main>
         <Footer />
       </div>
     );
   }
 
-  // Split content into paragraphs for better image interleaving
-  const paragraphs = news ? news.content.split('\n').filter(p => p.trim()) : [];
-  const additionalImages = news?.images || [];
-  
-  console.log('Rendering with paragraphs:', paragraphs.length);
-  console.log('Additional images:', additionalImages.length, additionalImages);
-  
-  // Helper function to interleave images with text (news website style)
-  const renderContentWithImages = () => {
-    const elements = [];
-    const totalParagraphs = paragraphs.length;
-    const totalImages = additionalImages.length;
-    
-    // Calculate where to insert images (evenly distributed)
-    const imagePositions = totalImages > 0 
-      ? Array.from({ length: totalImages }, (_, i) => 
-          Math.floor((totalParagraphs / (totalImages + 1)) * (i + 1))
-        )
-      : [];
-    
-    let imageIndex = 0;
-    
-    paragraphs.forEach((paragraph, index) => {
-      // Add paragraph
-      elements.push(
-        <p key={`p-${index}`} className="text-gray-800 text-lg leading-relaxed mb-6">
-          {paragraph}
-        </p>
-      );
-      
-      // Check if we should insert an image after this paragraph
-      if (imagePositions.includes(index + 1) && imageIndex < totalImages) {
-        const imageUrl = additionalImages[imageIndex];
-        const imageNum = imageIndex;
-        elements.push(
-          <figure key={`img-${imageNum}`} className="my-8">
-            <div 
-              className="relative w-full overflow-hidden rounded-lg shadow-lg cursor-pointer group"
-              onClick={() => window.open(imageUrl, '_blank')}
-            >
-              <img 
-                src={imageUrl} 
-                alt={`${news.title} - Image ${imageNum + 1}`}
-                className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-300"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = '/placeholder.svg';
-                }}
-              />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-            </div>
-            <figcaption className="text-sm text-gray-500 mt-2 text-center italic">
-              Click image to view full size
-            </figcaption>
-          </figure>
-        );
-        imageIndex++;
-      }
-    });
-    
-    // Add any remaining images at the end
-    while (imageIndex < totalImages) {
-      const imageUrl = additionalImages[imageIndex];
-      const imageNum = imageIndex;
-      elements.push(
-        <figure key={`img-${imageNum}`} className="my-8">
-          <div 
-            className="relative w-full overflow-hidden rounded-lg shadow-lg cursor-pointer group"
-            onClick={() => window.open(imageUrl, '_blank')}
-          >
-            <img 
-              src={imageUrl} 
-              alt={`${news.title} - Image ${imageNum + 1}`}
-              className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-300"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = '/placeholder.svg';
-              }}
-            />
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-          </div>
-          <figcaption className="text-sm text-gray-500 mt-2 text-center italic">
-            Click image to view full size
-          </figcaption>
-        </figure>
-      );
-      imageIndex++;
-    }
-    
-    return elements;
-  };
+  // Interleaved paragraphs and images
+  const paragraphs = news.content ? news.content.split("\n").filter((p) => p.trim()) : [];
+  const additionalImages = news.images || [];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white flex flex-col font-sans">
       <Header />
-      
-      {/* Hero Image (Full Width) */}
-      {news.image && (
-        <div className="relative w-full h-[50vh] md:h-[60vh] lg:h-[70vh] overflow-hidden mt-16">
-          <img 
-            src={news.image} 
-            alt={news.title}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-          
-          {/* Title Overlay on Hero Image */}
-          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12">
-            <div className="container mx-auto max-w-4xl">
-              <div className="flex items-center gap-3 mb-4">
+
+      <main className="flex-grow">
+        {/* Page Header Banner */}
+        <section className="relative h-44 sm:h-52 md:h-60 flex items-center justify-center text-white overflow-hidden">
+          <div className="absolute inset-0 z-0">
+            <img
+              src="/01.jpg"
+              alt={news.title}
+              className="w-full h-full object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-church-navy/85 backdrop-blur-[0.5px]" />
+          </div>
+
+          <div className="container mx-auto px-4 relative z-10 text-center">
+            <nav className="flex items-center justify-center gap-2 text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2.5">
+              <Link to="/" className="hover:text-church-gold transition-colors">
+                Home
+              </Link>
+              <ChevronRight className="h-3 w-3 text-slate-400" />
+              <Link to="/news" className="hover:text-church-gold transition-colors">
+                News
+              </Link>
+              <ChevronRight className="h-3 w-3 text-slate-400" />
+              <span className="text-church-gold">Article</span>
+            </nav>
+
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-serif font-bold tracking-tight text-white mb-1 line-clamp-1 max-w-3xl mx-auto">
+              {news.title}
+            </h2>
+            <p className="text-[11px] sm:text-xs text-slate-300 uppercase tracking-widest font-medium">
+              Anglican Church of Rwanda • Shyogwe Diocese
+            </p>
+          </div>
+        </section>
+
+        {/* Article Reading Area */}
+        <article className="py-12 bg-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+            
+            {/* Back Button */}
+            <div className="mb-6">
+              <Link
+                to="/news"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-church-navy transition-colors py-1 px-3 rounded-lg bg-slate-50 border border-slate-200"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" />
+                <span>Back to All Articles</span>
+              </Link>
+            </div>
+
+            {/* Article Header Metadata */}
+            <div className="mb-6">
+              <div className="flex flex-wrap items-center gap-3 mb-3">
                 {news.featured && (
-                  <Badge className="bg-church-red text-white text-sm px-3 py-1">Featured Story</Badge>
+                  <span className="text-xs font-bold text-church-navy bg-church-cream px-3 py-1 rounded-full border border-church-gold/20">
+                    Featured Story
+                  </span>
                 )}
-                <span className="text-white/90 text-sm">
-                  {news.published_at && new Date(news.published_at).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </span>
+                {news.published_at && (
+                  <span className="text-xs text-slate-500 flex items-center gap-1.5">
+                    <Calendar className="h-3.5 w-3.5 text-church-gold" />
+                    {formatDate(news.published_at)}
+                  </span>
+                )}
+                {news.author && (
+                  <span className="text-xs text-slate-500 flex items-center gap-1.5">
+                    <User className="h-3.5 w-3.5 text-slate-400" />
+                    <span>By {news.author}</span>
+                  </span>
+                )}
               </div>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 leading-tight drop-shadow-lg">
+
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-church-navy leading-tight mb-4">
                 {news.title}
               </h1>
-              {news.author && (
-                <div className="flex items-center text-white/90">
-                  <User className="h-4 w-4 mr-2" />
-                  <span className="font-medium">By {news.author}</span>
-                </div>
-              )}
             </div>
-          </div>
-        </div>
-      )}
 
-      {/* Article Content */}
-      <article className="py-8 md:py-12">
-        <div className="container mx-auto px-4">
-          {/* Breadcrumb */}
-          <div className="max-w-4xl mx-auto mb-6">
-            <div className="flex items-center text-sm text-gray-600">
-              <Link to="/" className="hover:text-church-red transition-colors">Home</Link>
-              <span className="mx-2">/</span>
-              <Link to="/news" className="hover:text-church-red transition-colors">News</Link>
-              <span className="mx-2">/</span>
-              <span className="text-gray-900 truncate">{news.title}</span>
-            </div>
-          </div>
-
-          <div className="max-w-4xl mx-auto">
-            {/* If no hero image, show title here */}
-            {!news.image && (
-              <div className="mb-8">
-                <div className="flex items-center gap-3 mb-4">
-                  {news.featured && (
-                    <Badge className="bg-church-red text-white">Featured Story</Badge>
-                  )}
-                  {news.published_at && (
-                    <span className="text-gray-500 text-sm">
-                      {new Date(news.published_at).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </span>
-                  )}
-                </div>
-                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
-                  {news.title}
-                </h1>
-                {news.author && (
-                  <div className="flex items-center text-gray-600">
-                    <User className="h-4 w-4 mr-2" />
-                    <span className="font-medium">By {news.author}</span>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Lead/Summary */}
+            {/* Lead Summary Callout */}
             {news.summary && (
-              <div className="bg-gray-50 border-l-4 border-church-red p-6 mb-8 rounded-r">
-                <p className="text-xl text-gray-700 leading-relaxed font-serif italic">
+              <div className="p-6 rounded-2xl bg-slate-50 border-l-4 border-church-gold border-slate-200/80 mb-8 shadow-2xs">
+                <p className="text-sm sm:text-base text-slate-700 leading-relaxed font-serif italic">
                   {news.summary}
                 </p>
               </div>
             )}
 
-            {/* Article Body with Interleaved Images */}
-            <div className="prose prose-lg max-w-none">
-              {renderContentWithImages()}
+            {/* Main Featured Image */}
+            {news.image && (
+              <div className="mb-8 rounded-2xl overflow-hidden border border-slate-200/90 shadow-2xs bg-slate-100">
+                <img
+                  src={resolveNewsImageUrl(news.image)}
+                  alt={news.title}
+                  className="w-full h-auto max-h-[500px] object-cover object-center"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "/01.jpg";
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Article Body */}
+            <div className="prose prose-slate max-w-none text-slate-800 space-y-5 leading-relaxed text-sm sm:text-base font-sans">
+              {paragraphs.map((p, idx) => (
+                <p key={idx} className="leading-relaxed text-slate-700">
+                  {p}
+                </p>
+              ))}
             </div>
 
-            {/* Article Footer */}
-            <div className="mt-12 pt-8 border-t border-gray-200">
-              {/* Tags or Categories could go here */}
-              <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-                <div className="flex items-center space-x-3">
-                  <Share2 className="h-5 w-5 text-gray-400" />
-                  <span className="text-sm text-gray-600 font-medium">Share this article</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Button 
-                    variant="outline"
-                    onClick={() => {
-                      const url = window.location.href;
-                      navigator.clipboard.writeText(url);
-                      toast.success('Link copied to clipboard!');
-                    }}
-                    size="sm"
-                  >
-                    Copy Link
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    onClick={() => window.print()}
-                    size="sm"
-                  >
-                    Print
-                  </Button>
+            {/* Additional Photo Gallery if Present */}
+            {additionalImages.length > 0 && (
+              <div className="mt-12 pt-8 border-t border-slate-200/80">
+                <h3 className="text-lg font-serif font-bold text-church-navy mb-4">
+                  Event Photo Gallery
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {additionalImages.map((imgUrl, i) => (
+                    <div
+                      key={i}
+                      className="rounded-xl overflow-hidden border border-slate-200 shadow-2xs group cursor-pointer"
+                      onClick={() => window.open(resolveNewsImageUrl(imgUrl), "_blank")}
+                    >
+                      <img
+                        src={resolveNewsImageUrl(imgUrl)}
+                        alt={`${news.title} photo ${i + 1}`}
+                        className="w-full h-44 object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = "/placeholder.svg";
+                        }}
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
+            )}
 
-            {/* Back to News CTA */}
-            <div className="mt-12 pt-8 border-t border-gray-200">
-              <div className="bg-gradient-to-r from-church-red/5 to-church-red/10 rounded-lg p-8 text-center">
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">Stay Informed</h3>
-                <p className="text-gray-600 mb-6">Read more inspiring stories from Shyogwe Diocese</p>
-                <Button 
-                  variant="elegant"
-                  onClick={() => navigate('/news')}
-                  size="lg"
+            {/* Sharing and Action Controls */}
+            <div className="mt-10 pt-6 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
+                <Share2 className="h-4 w-4 text-church-gold" />
+                <span>Share this article</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopyLink}
+                  className="text-xs flex items-center gap-1.5"
                 >
-                  <Newspaper className="h-4 w-4 mr-2" />
-                  View All News Articles
+                  {copied ? (
+                    <>
+                      <Check className="h-3.5 w-3.5 text-emerald-600" />
+                      <span className="text-emerald-700 font-bold">Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Share2 className="h-3.5 w-3.5" />
+                      <span>Copy Link</span>
+                    </>
+                  )}
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.print()}
+                  className="text-xs flex items-center gap-1.5"
+                >
+                  <Printer className="h-3.5 w-3.5" />
+                  <span>Print Article</span>
                 </Button>
               </div>
             </div>
+
+            {/* Bottom Callout */}
+            <div className="mt-12 bg-slate-50 rounded-2xl p-6 sm:p-8 border border-slate-200/90 text-center">
+              <h3 className="text-xl font-serif font-bold text-church-navy mb-2">
+                Stay Connected with Shyogwe Diocese
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 mb-5 max-w-lg mx-auto leading-relaxed">
+                Explore more announcements, diocesan pastoral letters, community developments, and upcoming ecclesiastical events.
+              </p>
+              <div className="flex justify-center gap-3">
+                <Button
+                  onClick={() => navigate("/news")}
+                  className="bg-church-navy hover:bg-church-navy/90 text-white text-xs font-bold px-5 py-2 rounded-xl"
+                >
+                  <Newspaper className="h-4 w-4 mr-2" />
+                  Browse All Articles
+                </Button>
+              </div>
+            </div>
+
           </div>
-        </div>
-      </article>
-      
+        </article>
+      </main>
+
       <Footer />
     </div>
   );
-};
-
-export default NewsDetail;
+}

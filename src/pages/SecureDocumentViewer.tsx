@@ -192,8 +192,9 @@ const SecureDocumentViewer = () => {
                 </div>
 
                 {!documentInfo?.download_allowed && user?.role !== 'admin' && (
-                    <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg text-center text-sm text-orange-800">
-                        🔒 This document is protected. Downloads are disabled. View only.
+                    <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg text-center text-sm text-orange-800 flex items-center justify-center gap-1.5">
+                        <Lock className="h-4 w-4 text-orange-700" />
+                        <span>This document is protected. Downloads are disabled. View only.</span>
                     </div>
                 )}
             </main>

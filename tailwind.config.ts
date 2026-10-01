@@ -52,7 +52,11 @@ export default {
           red: "hsl(var(--church-red))",
           "red-light": "hsl(var(--church-red-light))",
           navy: "hsl(var(--church-navy))",
+          "navy-light": "hsl(var(--church-navy-light))",
+          gold: "hsl(var(--church-gold))",
+          "gold-hover": "hsl(var(--church-gold-hover))",
           cream: "hsl(var(--church-cream))",
+          charcoal: "hsl(var(--church-charcoal))",
           sage: "hsl(var(--church-sage))",
         },
         sidebar: {

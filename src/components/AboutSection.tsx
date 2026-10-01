@@ -1,83 +1,178 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Heart, Users, Book, HandHeart } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import { Link } from "react-router-dom";
+import { 
+  Church, 
+  BookOpen, 
+  HeartHandshake, 
+  Compass, 
+  ArrowRight,
+  Target,
+  Eye
+} from "lucide-react";
+
+interface ValueItem {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+}
+
+const VALUES: ValueItem[] = [
+  {
+    icon: Church,
+    title: "Anglican Faith",
+    description: "Firmly rooted in Christ through liturgical worship, Holy Scripture, and historic Anglican fellowship.",
+  },
+  {
+    icon: HeartHandshake,
+    title: "Vibrant Community",
+    description: "Walking alongside families, youths, and congregations through pastoral care and mutual fellowship.",
+  },
+  {
+    icon: BookOpen,
+    title: "Biblical Teaching",
+    description: "Equipping clergy and disciples with sound doctrine and practical Christian education.",
+  },
+  {
+    icon: Compass,
+    title: "Holistic Outreach",
+    description: "Transforming lives through church-founded schools, medical centers, clean water, and community care.",
+  },
+];
 
 const AboutSection = () => {
-  const values = [
-    {
-      icon: Heart,
-      title: "Faith",
-      description: "Rooted in the Anglican tradition, we seek to know and follow Christ in all aspects of life."
-    },
-    {
-      icon: Users,
-      title: "Community",
-      description: "We believe in the power of fellowship and supporting one another through life's journey."
-    },
-    {
-      icon: Book,
-      title: "Scripture",
-      description: "The Word of God guides our worship, teaching, and daily living as we grow in understanding."
-    },
-    {
-      icon: HandHeart,
-      title: "Service",
-      description: "Called to serve our neighbors and community through acts of love and compassion."
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
     }
-  ];
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <section id="about" className="py-20 bg-gradient-section">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-church-red mb-6">
-            About Our Church
+    <section 
+      ref={sectionRef} 
+      id="about" 
+      className="py-16 lg:py-20 bg-gradient-to-b from-church-cream/30 via-white to-white overflow-hidden"
+    >
+      <div className="container mx-auto px-4 sm:px-6 lg:px-12">
+        {/* Section Header */}
+        <div 
+          className={`max-w-2xl mx-auto text-center mb-12 sm:mb-14 transition-all duration-700 ease-out ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
+          }`}
+        >
+          <span className="text-xs uppercase tracking-widest text-church-gold font-bold">
+            Who We Are
+          </span>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-church-navy tracking-tight mt-1.5 mb-3">
+            About Our Diocese
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            The Anglican Church of Rwanda Shyogwe Diocese (EAR Shyogwe Diocese) is one of the dioceses of the Anglican Church of Rwanda. 
-            It is located in the Southern Province of Rwanda, with its headquarters in Muhanga District (Mucyakabiri).
+          <p className="text-xs sm:text-sm md:text-base text-church-charcoal/75 leading-relaxed">
+            The Anglican Church of Rwanda Shyogwe Diocese serves across the Southern Province, 
+            with its diocesan headquarters in Muhanga District (Mucyakabiri).
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          {values.map((value, index) => (
-            <Card key={index} className="text-center p-6 shadow-soft hover:shadow-medium transition-shadow">
-              <CardContent className="pt-6">
-                <div className="w-16 h-16 bg-gradient-accent rounded-full flex items-center justify-center mx-auto mb-4">
-                  <value.icon className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold text-foreground mb-3">{value.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{value.description}</p>
-              </CardContent>
-            </Card>
+        {/* 4 Core Pillar Cards (Luminous & Light - No heavy dark blocks) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
+          {VALUES.map((val, idx) => (
+            <div
+              key={idx}
+              style={{ transitionDelay: `${idx * 100}ms` }}
+              className={`bg-white rounded-xl p-5 border border-church-cream shadow-xs hover:shadow-md hover:border-church-gold/40 transition-all duration-500 ease-out group hover:-translate-y-1 ${
+                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+              }`}
+            >
+              {/* Luminous, light icon container */}
+              <div className="w-11 h-11 rounded-lg bg-church-cream/80 text-church-navy flex items-center justify-center mb-3.5 group-hover:bg-church-gold group-hover:text-church-navy transition-colors duration-300">
+                <val.icon className="h-5 w-5 transition-transform duration-300 group-hover:scale-110" />
+              </div>
+              <h3 className="text-sm sm:text-base font-bold text-church-navy tracking-tight mb-1.5 group-hover:text-church-gold transition-colors">
+                {val.title}
+              </h3>
+              <p className="text-xs text-church-charcoal/70 leading-relaxed">
+                {val.description}
+              </p>
+            </div>
           ))}
         </div>
 
-        <div className="bg-background rounded-2xl p-8 md:p-12 shadow-medium">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h3 className="text-3xl font-bold text-foreground mb-6">Our History</h3>
-              <p className="text-muted-foreground mb-6 leading-relaxed">
-                The Anglican Church of Rwanda, Shyogwe Diocese has been a cornerstone of faith in our communities across Muhanga, Kamonyi, and surrounding areas. 
-                Our churches and institutions stand as a testament to the dedication of generations 
-                who have worshipped and served within our diocese.
+        {/* History & Vision / Mission Combined Card */}
+        <div 
+          className={`bg-white rounded-2xl p-6 sm:p-8 lg:p-10 border border-church-cream shadow-soft transition-all duration-700 delay-300 ease-out ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+          }`}
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+            {/* Left: Diocesan Story */}
+            <div className="lg:col-span-7">
+              <span className="text-xs font-semibold uppercase tracking-wider text-church-gold">
+                Heritage & Witness
+              </span>
+              <h3 className="text-xl sm:text-2xl font-bold text-church-navy tracking-tight mt-1 mb-3.5">
+                Our History & Ministry
+              </h3>
+              <p className="text-xs sm:text-sm text-church-charcoal/75 leading-relaxed mb-3">
+                Since its establishment, the Shyogwe Diocese has stood as a pillar of faith, hope, and compassion throughout Muhanga, Kamonyi, Ruhango, and surrounding districts.
               </p>
-              <p className="text-muted-foreground leading-relaxed">
-                Today, we continue to honor our rich Anglican traditions while embracing new ways to serve God and our communities. 
-                Our diverse congregations come together to worship, learn, and grow in faith across the diocese.
+              <p className="text-xs sm:text-sm text-church-charcoal/75 leading-relaxed mb-5">
+                Generations of faithful Christians, clergy, and teachers have partnered to build churches, educate children, and care for the sick, leaving an enduring legacy of Christian discipleship.
               </p>
+
+              <Link
+                to="/about"
+                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-church-gold hover:text-church-navy transition-colors group"
+              >
+                <span>Read Full Diocesan Story</span>
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
             </div>
-            <div className="bg-church-cream/50 rounded-xl p-8 space-y-6">
-              <div>
-                <h4 className="text-2xl font-semibold text-foreground mb-2">Vision</h4>
-                <blockquote className="text-lg italic text-muted-foreground leading-relaxed border-l-4 border-church-red pl-6">
-                  "Holy Soul in a Health Body"
-                </blockquote>
+
+            {/* Right: Vision & Mission (Clean Light Aesthetic) */}
+            <div className="lg:col-span-5 bg-church-cream/40 rounded-xl p-5 sm:p-6 border border-church-cream/80 space-y-4">
+              {/* Vision */}
+              <div className="flex gap-3">
+                <div className="w-8 h-8 rounded-md bg-white text-church-gold flex items-center justify-center flex-shrink-0 shadow-xs border border-church-cream">
+                  <Eye className="h-4 w-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs uppercase tracking-wider font-bold text-church-navy">
+                    Our Vision
+                  </h4>
+                  <p className="text-xs sm:text-sm font-medium text-church-charcoal/85 mt-0.5 italic">
+                    "Holy Soul in a Healthy Body"
+                  </p>
+                </div>
               </div>
-              <div>
-                <h4 className="text-2xl font-semibold text-foreground mb-2">Our Mission</h4>
-                <blockquote className="text-lg italic text-muted-foreground leading-relaxed border-l-4 border-church-red pl-6">
-                  "A self-reliant, self-replicating, and self-sustaining diocese."
-                </blockquote>
+
+              <div className="border-t border-church-cream/80" />
+
+              {/* Mission */}
+              <div className="flex gap-3">
+                <div className="w-8 h-8 rounded-md bg-white text-church-navy flex items-center justify-center flex-shrink-0 shadow-xs border border-church-cream">
+                  <Target className="h-4 w-4 text-church-gold" />
+                </div>
+                <div>
+                  <h4 className="text-xs uppercase tracking-wider font-bold text-church-navy">
+                    Our Mission
+                  </h4>
+                  <p className="text-xs sm:text-sm font-medium text-church-charcoal/85 mt-0.5 italic">
+                    "A self-reliant, self-replicating, and self-sustaining diocese."
+                  </p>
+                </div>
               </div>
             </div>
           </div>

@@ -31,6 +31,11 @@ use App\Http\Controllers\Api\Admin\SecurityController as AdminSecurityController
 use App\Http\Controllers\Api\Admin\AdminUserController;
 use App\Http\Controllers\Api\SecureDocumentPublicController;
 use App\Http\Controllers\Api\Admin\SecureDocumentController;
+use App\Http\Controllers\Api\AnalyticsController;
+
+// Analytics & Visitor Tracking
+Route::post('track-visit', [AnalyticsController::class, 'trackVisit']);
+Route::get('admin/analytics', [AnalyticsController::class, 'getStats']);
 
 // Authentication endpoints
 Route::post('login', [ApiAuthController::class, 'login']);
@@ -44,6 +49,15 @@ Route::get('events', [EventController::class, 'index']);
 Route::get('events/{id}', [EventController::class, 'show']);
 Route::get('news', [NewsController::class, 'index']);
 Route::get('news/{id}', [NewsController::class, 'show']);
+// Route to serve storage files via /api/storage/
+Route::get('storage/{path}', function ($path) {
+    $filePath = storage_path('app/public/' . $path);
+    if (!file_exists($filePath)) {
+        abort(404);
+    }
+    return response()->file($filePath);
+})->where('path', '.*');
+
 Route::get('events-test', function() {
     return response()->json(['message' => 'Events API is working', 'count' => \App\Models\Event::count()]);
 });

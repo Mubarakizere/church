@@ -1,6 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { apiUrls } from '../config/api';
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  MapPin, 
+  Phone, 
+  Mail, 
+  User, 
+  Stethoscope, 
+  GraduationCap, 
+  Building2,
+  CheckCircle2,
+  Loader2
+} from 'lucide-react';
 
 interface School {
   id: number;
@@ -710,122 +725,166 @@ const ProjectDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading {getCategoryTitle(category || '')}...</p>
-        </div>
+      <div className="min-h-screen bg-white flex flex-col font-sans">
+        <Header />
+        <main className="flex-grow flex items-center justify-center py-24">
+          <div className="text-center">
+            <Loader2 className="h-10 w-10 text-church-navy animate-spin mx-auto mb-3" />
+            <p className="text-sm font-medium text-slate-500">Loading {getCategoryTitle(category || '')}...</p>
+          </div>
+        </main>
+        <Footer />
       </div>
     );
   }
 
+  const catTitle = getCategoryTitle(category || '');
+  const catDesc = getCategoryDescription(category || '');
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-white flex flex-col font-sans">
+      <Header />
+
+      <main className="flex-grow">
+        {/* Page Header Banner with Background Image */}
+        <section className="relative h-48 sm:h-56 md:h-64 flex items-center justify-center text-white overflow-hidden">
+          <div className="absolute inset-0 z-0">
+            <img
+              src="/01.jpg"
+              alt={catTitle}
+              className="w-full h-full object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-church-navy/80 backdrop-blur-[0.5px]" />
+          </div>
+
+          <div className="container mx-auto px-4 relative z-10 text-center">
+            <nav className="flex items-center justify-center gap-2 text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2.5">
+              <Link to="/" className="hover:text-church-gold transition-colors">
+                Home
+              </Link>
+              <ChevronRight className="h-3 w-3 text-slate-400" />
+              <Link to="/projects" className="hover:text-church-gold transition-colors">
+                Projects
+              </Link>
+              <ChevronRight className="h-3 w-3 text-slate-400" />
+              <span className="text-church-gold">{catTitle}</span>
+            </nav>
+
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold tracking-tight text-white mb-2">
+              {catTitle}
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-200 uppercase tracking-widest font-medium">
+              Anglican Church of Rwanda • Shyogwe Diocese
+            </p>
+          </div>
+        </section>
+
+        {/* Sub-header Navigation Strip */}
+        <section className="py-6 bg-slate-50 border-b border-slate-200/80">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <button
-                onClick={() => navigate('/projects')}
-                className="flex items-center text-blue-600 hover:text-blue-800 mb-4"
+              <Link
+                to="/projects"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-church-navy hover:text-church-gold transition-colors mb-1"
               >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                Back to Projects
-              </button>
-              <h1 className="text-3xl font-bold text-gray-900">{getCategoryTitle(category || '')}</h1>
-              <p className="mt-2 text-gray-600">{getCategoryDescription(category || '')}</p>
+                <ChevronLeft className="h-4 w-4" />
+                <span>Back to All Projects & Programs</span>
+              </Link>
+              <p className="text-xs sm:text-sm text-slate-600 max-w-2xl">{catDesc}</p>
+            </div>
+
+            <div className="text-xs font-bold text-church-navy bg-church-cream/70 border border-church-cream px-3 py-1.5 rounded-lg self-start sm:self-auto shrink-0">
+              {data.length} Facilities Listed
             </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {error && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
+        {/* Facilities Grid */}
+        <section className="py-14 bg-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+            {data.length === 0 ? (
+              <div className="text-center py-16">
+                <Building2 className="mx-auto h-12 w-12 text-slate-300 mb-3" />
+                <h3 className="text-base font-bold text-church-navy">No records found</h3>
+                <p className="text-xs text-slate-500 mt-1">There are currently no records in this category.</p>
+                <div className="mt-5">
+                  <Link
+                    to="/projects"
+                    className="inline-flex items-center gap-1 text-xs font-bold text-church-navy hover:text-church-gold"
+                  >
+                    <ChevronLeft className="h-4 w-4" /> Return to Programs
+                  </Link>
+                </div>
               </div>
-              <div className="ml-3">
-                <p className="text-sm text-yellow-800">
-                  {error}. Showing fallback data.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+            ) : (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {data.map((item) => (
+                  <div 
+                    key={item.id} 
+                    className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-church-gold/60 transition-all p-5 sm:p-6 flex flex-col justify-between"
+                  >
+                    <div>
+                      <h3 className="text-lg font-serif font-bold text-church-navy mb-2 leading-snug">
+                        {item.name}
+                      </h3>
+                      {item.description && (
+                        <p className="text-xs text-slate-600 leading-relaxed mb-4">
+                          {item.description}
+                        </p>
+                      )}
 
-        {data.length === 0 ? (
-          <div className="text-center py-12">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No {getCategoryTitle(category || '').toLowerCase()} found</h3>
-            <p className="mt-1 text-sm text-gray-500">There are currently no {getCategoryTitle(category || '').toLowerCase()} in our database.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {data.map((item) => (
-              <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.name}</h3>
-                  <p className="text-gray-600 mb-4">{item.description}</p>
-                  
-                  <div className="space-y-2">
-                    <div className="flex items-center text-sm text-gray-500">
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                      {item.location}
+                      <div className="space-y-2 text-xs text-slate-600 pt-2 border-t border-slate-100">
+                        {item.location && (
+                          <div className="flex items-center gap-2">
+                            <MapPin className="h-3.5 w-3.5 text-church-gold shrink-0" />
+                            <span>{item.location}</span>
+                          </div>
+                        )}
+
+                        {item.head_teacher && (
+                          <div className="flex items-center gap-2">
+                            <User className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                            <span>Head Teacher: {item.head_teacher}</span>
+                          </div>
+                        )}
+
+                        {item.contact_phone && (
+                          <div className="flex items-center gap-2">
+                            <Phone className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                            <a href={`tel:${item.contact_phone}`} className="hover:text-church-navy">
+                              {item.contact_phone}
+                            </a>
+                          </div>
+                        )}
+
+                        {item.contact_email && (
+                          <div className="flex items-center gap-2">
+                            <Mail className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                            <a href={`mailto:${item.contact_email}`} className="hover:text-church-navy">
+                              {item.contact_email}
+                            </a>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    
-                    {item.head_teacher && (
-                      <div className="flex items-center text-sm text-gray-500">
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        {item.head_teacher}
-                      </div>
-                    )}
-                    
-                    {item.contact_phone && (
-                      <div className="flex items-center text-sm text-gray-500">
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                        </svg>
-                        {item.contact_phone}
-                      </div>
-                    )}
-                    
-                    {item.contact_email && (
-                      <div className="flex items-center text-sm text-gray-500">
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                        {item.contact_email}
-                      </div>
-                    )}
-                    
+
                     {item.services && (
-                      <div className="mt-3">
-                        <h4 className="text-sm font-medium text-gray-900 mb-1">Services:</h4>
-                        <p className="text-sm text-gray-600">{item.services}</p>
+                      <div className="mt-4 pt-3 border-t border-slate-100">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                          Services Offered
+                        </span>
+                        <p className="text-xs text-slate-700">{item.services}</p>
                       </div>
                     )}
                   </div>
-                </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
-        )}
-      </div>
+        </section>
+      </main>
+
+      <Footer />
     </div>
   );
 };

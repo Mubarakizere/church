@@ -14,26 +14,28 @@ return new class extends Migration
         Schema::create('secure_documents', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('description', 500)->nullable();
-            $table->string('category', 100)->nullable();
+            $table->text('description')->nullable();
+            $table->string('category')->nullable();
             
             // File information
-            $table->string('file_path'); // Actual storage path (not public)
+            $table->string('file_path'); // Storage path
             $table->string('original_filename');
             $table->string('file_type', 50); // pdf, docx, xlsx, etc.
             $table->unsignedBigInteger('file_size'); // in bytes
             
             // Access control
-            $table->enum('access_level', ['public', 'password', 'role_based'])->default('password');
+            $table->string('access_level', 50)->default('password'); // public, password, role_based
             $table->string('password')->nullable(); // Hashed password
-            $table->json('allowed_roles')->nullable(); // ['admin', 'editor', 'viewer']
+            $table->text('allowed_roles')->nullable(); // JSON array or text
             
-            // Visibility
+            // Visibility & Control
             $table->boolean('is_public')->default(false); // Show on public website
             $table->boolean('is_active')->default(true); // Active in admin dashboard
+            $table->boolean('download_allowed')->default(true);
             
             // Tracking
-            $table->unsignedInteger('download_count')->default(0);
+            $table->unsignedBigInteger('download_count')->default(0);
+            $table->unsignedInteger('view_count')->default(0);
             $table->timestamp('last_downloaded_at')->nullable();
             
             // Metadata
@@ -48,25 +50,27 @@ return new class extends Migration
         });
         
         // Download logs table for tracking
-        Schema::create('secure_document_downloads', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('secure_document_id');
-            $table->unsignedBigInteger('user_id')->nullable(); // Null if anonymous
-            $table->string('ip_address', 45);
-            $table->string('user_agent', 500)->nullable();
-            $table->boolean('access_granted')->default(true);
-            $table->string('access_method', 50)->nullable(); // 'password', 'role', 'public'
-            $table->timestamp('downloaded_at');
-            
-            $table->foreign('secure_document_id')
-                  ->references('id')
-                  ->on('secure_documents')
-                  ->onDelete('cascade');
-                  
-            $table->index('secure_document_id');
-            $table->index('user_id');
-            $table->index('downloaded_at');
-        });
+        if (!Schema::hasTable('secure_document_downloads')) {
+            Schema::create('secure_document_downloads', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('secure_document_id');
+                $table->unsignedBigInteger('user_id')->nullable(); // Null if anonymous
+                $table->string('ip_address', 45);
+                $table->string('user_agent', 500)->nullable();
+                $table->boolean('access_granted')->default(true);
+                $table->string('access_method', 50)->nullable(); // 'password', 'role', 'public'
+                $table->timestamp('downloaded_at');
+                
+                $table->foreign('secure_document_id')
+                      ->references('id')
+                      ->on('secure_documents')
+                      ->onDelete('cascade');
+                      
+                $table->index('secure_document_id');
+                $table->index('user_id');
+                $table->index('downloaded_at');
+            });
+        }
     }
 
     /**

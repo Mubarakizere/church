@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('secure_documents', function (Blueprint $table) {
-            $table->boolean('download_allowed')->default(true)->after('is_active');
-            $table->unsignedInteger('view_count')->default(0)->after('download_count');
+            if (!Schema::hasColumn('secure_documents', 'download_allowed')) {
+                $table->boolean('download_allowed')->default(true)->after('is_active');
+            }
+            if (!Schema::hasColumn('secure_documents', 'view_count')) {
+                $table->unsignedInteger('view_count')->default(0)->after('download_count');
+            }
         });
     }
 
@@ -23,7 +27,16 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('secure_documents', function (Blueprint $table) {
-            $table->dropColumn(['download_allowed', 'view_count']);
+            $columnsToDrop = [];
+            if (Schema::hasColumn('secure_documents', 'download_allowed')) {
+                $columnsToDrop[] = 'download_allowed';
+            }
+            if (Schema::hasColumn('secure_documents', 'view_count')) {
+                $columnsToDrop[] = 'view_count';
+            }
+            if (!empty($columnsToDrop)) {
+                $table->dropColumn($columnsToDrop);
+            }
         });
     }
 };

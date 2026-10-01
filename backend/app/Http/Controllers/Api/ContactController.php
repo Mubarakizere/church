@@ -43,7 +43,11 @@ class ContactController extends Controller
             ]);
 
             // Send email notification
-            $this->sendContactEmail($data);
+            try {
+                $this->sendContactEmail($data);
+            } catch (\Exception $mailEx) {
+                Log::warning('Contact form email delivery deferred: ' . $mailEx->getMessage());
+            }
 
             return response()->json([
                 'success' => true,

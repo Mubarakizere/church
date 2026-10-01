@@ -1,6 +1,6 @@
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, Users, Music, Book, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Clock, Users, Music, Book, Loader2, CheckCircle2 } from "lucide-react";
 import { apiUrls } from "@/config/api";
 
 interface Service {
@@ -13,48 +13,38 @@ interface Service {
   language: string;
 }
 
-const ServicesSection = () => {
+const ServicesSection: React.FC = () => {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  // Fallback data in case API fails
-  const fallbackServices = [
+  // Fallback data aligned with database records
+  const fallbackServices: Service[] = [
     {
       id: "1",
-      title: "Sunday Morning Service",
-      time: "9:00 AM",
-      type: "Holy Communion",
-      description: "Traditional Anglican service with choir, organ, and full liturgy. Perfect for families and those who appreciate formal worship.",
-      features: ["Holy Communion", "Choir & Organ", "Children's Ministry", "Coffee Fellowship"],
+      title: "English Service",
+      time: "6:30 AM - 8:30 AM",
+      type: "Holy Communion in English",
+      description: "Early morning Anglican service conducted entirely in English. Traditional liturgy with Holy Communion, perfect for English-speaking congregation members and visitors.",
+      features: ["English Liturgy", "Holy Communion", "Traditional Hymns", "Morning Prayer"],
       language: "English"
     },
     {
       id: "2",
-      title: "Sunday Evening Service",
-      time: "6:00 PM", 
-      type: "Evening Prayer",
-      description: "A more intimate service focused on prayer, reflection, and contemporary worship. Great for busy families and young adults.",
-      features: ["Contemporary Music", "Interactive Prayer", "Sermon Discussion", "Light Refreshments"],
-      language: "English"
+      title: "Kinyarwanda Service",
+      time: "9:00 AM - 12:00 PM",
+      type: "Holy Communion in Kinyarwanda",
+      description: "Main morning service conducted in Kinyarwanda. Full Anglican liturgy with Holy Communion, choral worship, and vibrant community fellowship.",
+      features: ["Kinyarwanda Liturgy", "Holy Communion", "Cathedral Choir", "Community Fellowship"],
+      language: "Kinyarwanda"
     },
     {
       id: "3",
-      title: "Wednesday Bible Study",
-      time: "7:00 PM",
-      type: "Teaching & Fellowship",
-      description: "Weekly Bible study and discussion group. All ages welcome. Currently studying the Gospel of John.",
-      features: ["Scripture Study", "Group Discussion", "Prayer Time", "Childcare Available"],
-      language: "English"
-    },
-    {
-      id: "4",
-      title: "Special Services",
-      time: "Various",
-      type: "Seasonal & Holidays",
-      description: "Christmas, Easter, baptisms, confirmations, weddings, and other special occasions throughout the year.",
-      features: ["Christmas Eve", "Easter Vigil", "Baptisms", "Confirmations"],
-      language: "English"
+      title: "Mixed / Bilingual Service",
+      time: "3:30 PM - 5:30 PM",
+      type: "Bilingual Worship & Fellowship",
+      description: "Afternoon service combining both English and Kinyarwanda. A contemporary and traditional worship experience bringing together youths and families.",
+      features: ["Bilingual Worship", "Youth & Praise Ministry", "Contemporary & Traditional", "Unity in Fellowship"],
+      language: "Bilingual"
     }
   ];
 
@@ -63,49 +53,29 @@ const ServicesSection = () => {
       try {
         setLoading(true);
         const response = await fetch(apiUrls.services());
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch services: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        // Process the API response data
-        if (data) {
-          // Check if data is in data.data format or direct array format
-          const serviceArray = Array.isArray(data) ? data : 
-                              (data.data && Array.isArray(data.data)) ? data.data : 
-                              [];
-          
-          if (serviceArray.length > 0) {
-            // Map the API response to match our Service interface
-            const processedServices = serviceArray.map(service => ({
+        if (response.ok) {
+          const data = await response.json();
+          const list = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
+          if (list.length > 0) {
+            const mapped = list.map((service: any) => ({
               id: service.id.toString(),
-              title: service.title || '',
-              time: service.time || '',
-              type: service.type || '',
-              description: service.description || '',
+              title: service.title || "",
+              time: service.time || "",
+              type: service.type || "",
+              description: service.description || "",
               features: service.features ? 
-                (typeof service.features === 'string' ? 
-                  JSON.parse(service.features) : service.features) : [],
-              language: service.language || 'English'
+                (typeof service.features === "string" ? JSON.parse(service.features) : service.features) : [],
+              language: service.language || "English"
             }));
-            
-            setServices(processedServices);
-            setError(null);
+            setServices(mapped);
           } else {
-            console.warn("No services data found in API response, using fallback data");
             setServices(fallbackServices);
-            setError("No services found in the database. Showing default services instead.");
           }
         } else {
-          console.warn("Invalid API response format, using fallback data");
           setServices(fallbackServices);
-          setError("Unable to load services from the database. Showing default services instead.");
         }
       } catch (err) {
-        console.error("Error fetching services:", err);
-        setError("Unable to load services from the database. Showing default services instead.");
+        console.warn("Could not load services, using fallbacks:", err);
         setServices(fallbackServices);
       } finally {
         setLoading(false);
@@ -116,90 +86,73 @@ const ServicesSection = () => {
   }, []);
 
   return (
-    <section id="services" className="py-20 bg-background">
+    <section id="services" className="py-16 bg-white">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-church-red mb-6">
+        <div className="text-center mb-12">
+          <span className="text-xs font-bold uppercase tracking-wider text-church-gold block mb-2">
+            Worship Life
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-church-navy mb-3">
             Worship Services
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Join us for meaningful worship that honors God and nurtures our community. 
-            Whether you prefer traditional or contemporary styles, there's a place for you here.
+          <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
+            Join us for liturgical prayer, Scripture reading, preaching, and Holy Communion. 
+            All are welcome to worship with us.
           </p>
-          {error && (
-            <div className="mt-4 p-3 bg-yellow-50 text-yellow-800 rounded-md">
-              {error}
-            </div>
-          )}
         </div>
 
         {loading ? (
-          <div className="flex justify-center items-center py-20">
-            <Loader2 className="h-10 w-10 text-church-red animate-spin" />
-            <span className="ml-3 text-lg">Loading services...</span>
+          <div className="flex justify-center items-center py-16">
+            <Loader2 className="h-8 w-8 text-church-navy animate-spin" />
+            <span className="ml-3 text-sm text-slate-600">Loading services...</span>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {services.map((service) => (
-              <Card key={service.id} className="shadow-soft hover:shadow-medium transition-shadow">
-                <CardHeader className="pb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <CardTitle className="text-2xl text-foreground">{service.title}</CardTitle>
-                    <div className="flex items-center text-church-red">
-                      <Clock className="h-5 w-5 mr-2" />
-                      <span className="font-semibold">{service.time}</span>
-                    </div>
+              <div 
+                key={service.id} 
+                className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-church-gold/60 transition-all p-6 flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <span className="text-[11px] font-semibold text-slate-500 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-md">
+                      {service.language}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-church-navy bg-church-cream/70 px-2.5 py-1 rounded-md">
+                      <Clock className="h-3.5 w-3.5 text-church-gold" />
+                      {service.time}
+                    </span>
                   </div>
-                  <div className="flex items-center text-muted-foreground">
-                    <Music className="h-4 w-4 mr-2" />
-                    <span className="text-sm">{service.type}</span>
-                  </div>
-                  {service.language && (
-                    <div className="mt-1 text-xs text-muted-foreground">
-                      Language: {service.language}
-                    </div>
-                  )}
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground mb-6 leading-relaxed">
+
+                  <h3 className="text-xl font-serif font-bold text-church-navy mb-1">
+                    {service.title}
+                  </h3>
+                  <p className="text-xs font-semibold text-church-gold mb-3">
+                    {service.type}
+                  </p>
+
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
                     {service.description}
                   </p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {service.features.map((feature, featureIndex) => (
-                      <div key={featureIndex} className="flex items-center text-sm text-muted-foreground">
-                        <div className="w-2 h-2 bg-church-red rounded-full mr-2"></div>
-                        {feature}
+                </div>
+
+                <div className="pt-4 border-t border-slate-100">
+                  <span className="text-[11px] uppercase tracking-wider font-bold text-slate-400 block mb-2">
+                    Highlights
+                  </span>
+                  <div className="space-y-1.5">
+                    {service.features.map((feature, idx) => (
+                      <div key={idx} className="flex items-center gap-2 text-xs text-slate-700">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                        <span>{feature}</span>
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         )}
-
-        <div className="mt-16 bg-gradient-accent rounded-2xl p-8 md:p-12 text-center">
-          <Users className="h-16 w-16 text-white mx-auto mb-6" />
-          <h3 className="text-3xl font-bold text-white mb-4">First Time Visiting?</h3>
-          <p className="text-lg text-white/90 mb-6 max-w-2xl mx-auto">
-            We'd love to welcome you! No need to dress up or bring anything special. 
-            Come as you are, and we'll help you feel at home.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <div className="flex items-center text-white">
-              <Book className="h-5 w-5 mr-2" />
-              <span>Prayer books provided</span>
-            </div>
-            <div className="flex items-center text-white">
-              <Users className="h-5 w-5 mr-2" />
-              <span>Greeters at the door</span>
-            </div>
-            <div className="flex items-center text-white">
-              <Clock className="h-5 w-5 mr-2" />
-              <span>Services start on time</span>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );

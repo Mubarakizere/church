@@ -8,111 +8,115 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Church color palette - Anglican inspired */
-    --background: 0 0% 100%;
-    --foreground: 215 25% 15%;
+    /* Main Brand Palette (Inspired by Reference) */
+    --background: 0 0% 100%;             /* White #FFFFFF */
+    --foreground: 217 28% 17%;           /* Dark Navy / Charcoal #1F2937 */
 
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    --card-foreground: 217 28% 17%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover-foreground: 217 28% 17%;
 
-    /* Pure red for primary - bold and powerful */
-    --primary: 0 100% 50%;
-    --primary-foreground: 0 0% 98%;
+    /* Primary: Deep Navy Blue (#071D3B) */
+    --primary: 215 79% 13%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Warm cream for secondary */
-    --secondary: 45 15% 94%;
-    --secondary-foreground: 215 25% 15%;
+    /* Secondary: Warm Cream / Off-White (#F6F0E3) */
+    --secondary: 41 51% 93%;
+    --secondary-foreground: 215 79% 13%;
 
-    /* Soft muted tones */
-    --muted: 210 15% 96%;
-    --muted-foreground: 215 15% 45%;
+    /* Accent: Warm Gold / Mustard Gold (#D99A20) */
+    --accent: 40 74% 49%;
+    --accent-foreground: 215 79% 13%;
 
-    /* Pure red accent for warmth and tradition */
-    --accent: 0 100% 50%;
-    --accent-foreground: 0 0% 98%;
+    /* Muted Tones */
+    --muted: 41 40% 95%;
+    --muted-foreground: 217 15% 42%;
 
-    --destructive: 0 100% 50%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 210 20% 90%;
-    --input: 210 20% 94%;
-    --ring: 0 100% 50%;
+    --border: 41 25% 88%;
+    --input: 41 25% 92%;
+    --ring: 40 74% 49%;
 
-    /* Church-specific design tokens */
-    --church-red: 0 100% 50%;
-    --church-red-light: 0 100% 60%;
-    --church-navy: 215 45% 20%;
-    --church-cream: 45 15% 94%;
+    /* Church Brand Dedicated Tokens */
+    --church-navy: 215 79% 13%;          /* #071D3B - Primary brand color */
+    --church-navy-light: 215 60% 22%;    /* Light Navy */
+    --church-gold: 40 74% 49%;           /* #D99A20 - Main accent */
+    --church-gold-hover: 40 74% 42%;     /* Hover Gold */
+    --church-cream: 41 51% 93%;          /* #F6F0E3 - Section background */
+    --church-charcoal: 217 28% 17%;       /* #1F2937 - Body text */
+    --church-red: 215 79% 13%;           /* Mapped to Deep Navy for back-compat */
+    --church-red-light: 215 65% 22%;
     --church-sage: 140 15% 75%;
     
-    /* Beautiful gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(0 100% 50%), hsl(0 100% 60%));
-    --gradient-section: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 98%));
-    --gradient-accent: linear-gradient(135deg, hsl(0 100% 50%), hsl(0 100% 60%));
+    /* Clean, non-flashy gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(215 79% 13%), hsl(215 85% 9%));
+    --gradient-section: linear-gradient(180deg, hsl(0 0% 100%), hsl(41 51% 93%));
+    --gradient-accent: linear-gradient(135deg, hsl(40 74% 49%), hsl(40 74% 42%));
     
-    /* Elegant shadows */
-    --shadow-soft: 0 4px 20px -4px hsl(0 100% 50% / 0.1);
-    --shadow-medium: 0 8px 30px -8px hsl(0 100% 50% / 0.15);
-    --shadow-strong: 0 20px 40px -12px hsl(0 100% 50% / 0.25);
+    /* Subtle clean shadows */
+    --shadow-soft: 0 2px 10px 0 rgba(7, 29, 59, 0.05);
+    --shadow-medium: 0 4px 18px 0 rgba(7, 29, 59, 0.08);
+    --shadow-strong: 0 8px 26px 0 rgba(7, 29, 59, 0.12);
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
+    --sidebar-background: 41 51% 96%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-foreground: 217 28% 17%;
 
-    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary: 215 79% 13%;
 
-    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-primary-foreground: 0 0% 100%;
 
-    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent: 41 51% 90%;
 
-    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-accent-foreground: 215 79% 13%;
 
-    --sidebar-border: 220 13% 91%;
+    --sidebar-border: 41 25% 88%;
 
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 40 74% 49%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 217 35% 8%;
+    --foreground: 0 0% 98%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 217 35% 11%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 217 35% 11%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 0 100% 50%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 40 74% 49%;
+    --primary-foreground: 215 79% 13%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 217 28% 18%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 217 28% 18%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 0 100% 50%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 40 74% 49%;
+    --accent-foreground: 215 79% 13%;
 
-    --destructive: 0 100% 50%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 45%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 0 100% 50%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 217 28% 22%;
+    --input: 217 28% 22%;
+    --ring: 40 74% 49%;
+    --sidebar-background: 217 35% 8%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 40 74% 49%;
+    --sidebar-primary-foreground: 215 79% 13%;
+    --sidebar-accent: 217 28% 18%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 217 28% 22%;
+    --sidebar-ring: 40 74% 49%;
   }
 }
 
@@ -130,6 +134,39 @@ All colors MUST be HSL.
 
 .animate-fade-in {
   animation: fade-in 0.5s ease-out;
+}
+
+@keyframes loader-progress {
+  0% {
+    width: 0%;
+  }
+  50% {
+    width: 70%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.animate-loader-progress {
+  animation: loader-progress 0.8s ease-in-out forwards;
+}
+
+@keyframes scroll-left-to-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.animate-scroll-ltr {
+  animation: scroll-left-to-right 50s linear infinite;
+}
+
+.animate-scroll-ltr-fast {
+  animation: scroll-left-to-right 35s linear infinite;
 }
 
 @layer base {

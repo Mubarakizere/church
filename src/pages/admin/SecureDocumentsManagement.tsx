@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiUrls } from "@/config/api";
-import { Trash2, Eye, EyeOff, Download, BarChart3, Lock, Unlock, FileText, Copy } from "lucide-react";
+import { Trash2, Eye, EyeOff, Download, BarChart3, Lock, Unlock, FileText, Copy, Key, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface SecureDocument {
@@ -486,7 +486,7 @@ const SecureDocumentsManagement = () => {
                                                 {getAccessLevelBadge(doc)}
                                                 {doc.password && (
                                                     <div className="flex items-center gap-1 px-2 py-1 text-xs rounded bg-amber-100 text-amber-700">
-                                                        🔑
+                                                        <Key className="h-3 w-3" />
                                                         {visiblePasswords.has(doc.id) ? (
                                                             <>
                                                                 <span className="font-mono">{doc.password}</span>
@@ -542,16 +542,20 @@ const SecureDocumentsManagement = () => {
                                                 <span>{doc.file_type.toUpperCase()}</span>
                                                 {doc.category && <span>Category: {doc.category}</span>}
                                                 <span className="flex items-center gap-1">
-                                                    👁️ {doc.view_count} views
+                                                    <Eye className="h-3 w-3" /> {doc.view_count} views
                                                 </span>
                                                 <span className="flex items-center gap-1">
                                                     <Download className="h-3 w-3" />
                                                     {doc.download_count} downloads
                                                 </span>
                                                 {doc.download_allowed ? (
-                                                    <span className="text-green-600">✓ Downloads enabled</span>
+                                                    <span className="text-green-600 flex items-center gap-1">
+                                                        <Check className="h-3 w-3" /> Downloads enabled
+                                                    </span>
                                                 ) : (
-                                                    <span className="text-orange-600">⊘ Downloads disabled</span>
+                                                    <span className="text-orange-600 flex items-center gap-1">
+                                                        <Lock className="h-3 w-3" /> Downloads disabled
+                                                    </span>
                                                 )}
                                             </div>
                                         </div>

@@ -123,7 +123,7 @@ if (DEV_CONFIG.suppressApiErrors) {
   };
 
   // Add a visual indicator that console errors are suppressed
-  console.log('%c🔇 Console errors suppressed for development', 'color: #10b981; font-weight: bold;');
-  console.log('%c📡 API connection errors are expected when no backend is running', 'color: #6b7280; font-style: italic;');
-  console.log('%c✅ Application is working with fallback data', 'color: #10b981; font-weight: bold;');
+  console.log('%c[Dev] Console errors suppressed for development', 'color: #10b981; font-weight: bold;');
+  console.log('%c[Dev] API connection errors are expected when no backend is running', 'color: #6b7280; font-style: italic;');
+  console.log('%c[Dev] Application is working with fallback data', 'color: #10b981; font-weight: bold;');
 }

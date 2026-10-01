@@ -44,11 +44,15 @@ import ChangePassword from "./pages/admin/ChangePassword";
 import UsersManagement from "./pages/admin/UsersManagement";
 import Documents from "./pages/Documents";
 import ProtectedRoute from "./components/ProtectedRoute";
+import RootLayout from "./components/RootLayout";
 
 // Create router with future flags enabled
 export const router = createBrowserRouter(
   [
-    { path: "/", element: <Index /> },
+    {
+      element: <RootLayout />,
+      children: [
+        { path: "/", element: <Index /> },
     { path: "/team", element: <Team /> },
     { path: "/bishop", element: <Bishop /> },
     { path: "/projects", element: <Projects /> },
@@ -95,6 +99,8 @@ export const router = createBrowserRouter(
     { path: "/admin/pages", element: <AdminPages /> },
     { path: "/admin/analytics", element: <AdminAnalytics /> },
     { path: "*", element: <NotFound /> }
+      ]
+    }
   ],
   {
     future: {

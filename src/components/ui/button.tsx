@@ -9,17 +9,19 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-soft",
+        default: "bg-church-navy text-white hover:bg-church-navy-light shadow-soft transition-colors font-medium",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+        outline: "border border-church-navy/30 bg-background text-church-navy hover:bg-church-cream hover:text-church-navy transition-colors",
+        secondary: "bg-church-cream text-church-navy hover:bg-church-cream/80 font-medium",
+        ghost: "hover:bg-church-cream hover:text-church-navy transition-colors",
+        link: "text-church-navy underline-offset-4 hover:underline hover:text-church-gold",
         // Church-specific variants
-        hero: "bg-gradient-accent text-white font-semibold hover:scale-105 transform transition-all duration-300 shadow-medium",
-        elegant: "bg-church-navy text-primary-foreground hover:bg-church-navy/90 shadow-soft border border-church-red/20",
-        red: "bg-church-red text-white hover:bg-church-red/90 font-medium shadow-soft",
-        "outline-red": "border-2 border-church-red text-church-red hover:bg-church-red hover:text-white",
+        hero: "bg-church-gold text-church-navy font-semibold hover:bg-church-gold-hover transition-colors shadow-soft",
+        navy: "bg-church-navy text-white font-medium hover:bg-church-navy-light shadow-soft transition-colors",
+        gold: "bg-church-gold text-church-navy font-semibold hover:bg-church-gold-hover shadow-soft transition-colors",
+        "outline-navy": "border-2 border-church-navy text-church-navy hover:bg-church-navy hover:text-white transition-colors",
+        "outline-gold": "border-2 border-church-gold text-church-navy bg-transparent hover:bg-church-gold hover:text-church-navy transition-colors",
+        elegant: "bg-church-navy text-white hover:bg-church-navy-light shadow-soft border border-church-gold/20",
       },
       size: {
         default: "h-10 px-4 py-2",

@@ -1,10 +1,9 @@
-import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, Clock } from "lucide-react";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import { apiUrls } from '@/config/api';
+import { apiUrls } from "@/config/api";
 
 interface HeroImage {
   id: number;
@@ -15,27 +14,66 @@ interface HeroImage {
   is_active: boolean;
 }
 
-const HeroSection = () => {
-  const [carouselImages, setCarouselImages] = useState<HeroImage[]>([]);
-  const [loading, setLoading] = useState(true);
+const FALLBACK_HERO_IMAGES: HeroImage[] = [
+  {
+    id: 1,
+    src: "/1.jpg",
+    title: "Welcome to Shyogwe Diocese",
+    subtitle: "Serving God and His people across Rwanda through preaching the Gospel and compassionate community action.",
+    display_order: 1,
+    is_active: true
+  },
+  {
+    id: 2,
+    src: "/01.jpg",
+    title: "Worship & Parish Life",
+    subtitle: "Join our parish congregations across the archdeaconries for prayer, Holy Communion, and fellowship.",
+    display_order: 2,
+    is_active: true
+  },
+  {
+    id: 3,
+    src: "/02.jpg",
+    title: "Transforming Lives & Communities",
+    subtitle: "Partnering in education, healthcare facilities, clean water, and rural development.",
+    display_order: 3,
+    is_active: true
+  },
+  {
+    id: 4,
+    src: "/03.jpg",
+    title: "Nurturing the Next Generation",
+    subtitle: "Guiding youth and families through Christian discipleship, education, and vocational training.",
+    display_order: 4,
+    is_active: true
+  },
+  {
+    id: 5,
+    src: "/001.jpg",
+    title: "A Living Heritage of Faith",
+    subtitle: "Rooted in Anglican tradition, growing together in Christ's love and service.",
+    display_order: 5,
+    is_active: true
+  }
+];
 
-  const services = [
-    {
-      title: "English Service",
-      time: "6:30 AM - 8:30 AM",
-      type: "Holy Communion in English"
-    },
-    {
-      title: "Kinyarwanda Service",
-      time: "9:00 AM - 12:00 PM",
-      type: "Holy Communion in Kinyarwanda"
-    },
-    {
-      title: "Mixed Service",
-      time: "3:30 PM - 5:30 PM",
-      type: "Bilingual Worship"
-    }
-  ];
+const HeroSection = () => {
+  const [carouselImages, setCarouselImages] = useState<HeroImage[]>(FALLBACK_HERO_IMAGES);
+  const [loading, setLoading] = useState(true);
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!api) return;
+
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap());
+
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap());
+    });
+  }, [api]);
 
   // Fetch hero images from database
   useEffect(() => {
@@ -44,78 +82,32 @@ const HeroSection = () => {
         const response = await fetch(apiUrls.heroImages());
         if (response.ok) {
           const result = await response.json();
-          if (result.success) {
-            // Filter only active images and sort by display order
+          if (result.success && Array.isArray(result.data) && result.data.length > 0) {
             const activeImagesRaw = result.data
               .filter((image: HeroImage) => image.is_active)
               .sort((a: HeroImage, b: HeroImage) => a.display_order - b.display_order);
 
-            // Normalize image src values to route storage through backend
-            const activeImages = activeImagesRaw.map((img: HeroImage) => {
-              let src = img.src || '/placeholder.svg';
-              if (src.startsWith('http')) {
-                return { ...img, src };
-              }
-              if (src === '/placeholder.svg' || src === 'placeholder.svg') {
-                return { ...img, src: '/placeholder.svg' };
-              }
-              let cleanPath = src.replace(/^\/+/, '').replace(/\\/g, '/');
-              if (cleanPath.startsWith('storage/')) {
-                cleanPath = cleanPath.substring(8);
-              }
-              const normalizedSrc = cleanPath.match(/^(hero-images|team-images|partner-logos)\//)
-                ? apiUrls.storage(cleanPath)
-                : src;
-              return { ...img, src: normalizedSrc };
-            });
-            setCarouselImages(activeImages);
+            if (activeImagesRaw.length > 0) {
+              const activeImages = activeImagesRaw.map((img: HeroImage) => {
+                let src = img.src || "/placeholder.svg";
+                if (src.startsWith("http")) return { ...img, src };
+                if (src === "/placeholder.svg" || src === "placeholder.svg") return { ...img, src: "/placeholder.svg" };
+                
+                let cleanPath = src.replace(/^\/+/, "").replace(/\\/g, "/");
+                if (cleanPath.startsWith("storage/")) {
+                  cleanPath = cleanPath.substring(8);
+                }
+                const normalizedSrc = cleanPath.match(/^(hero-images|team-images|partner-logos)\//)
+                  ? apiUrls.storage(cleanPath)
+                  : src;
+                return { ...img, src: normalizedSrc };
+              });
+              setCarouselImages(activeImages);
+            }
           }
         }
       } catch (error) {
-        console.error('Failed to fetch hero images:', error);
-        // Fallback to static images if API fails
-        setCarouselImages([
-          {
-            id: 1,
-            src: "/1.jpg",
-            title: "Welcome to Our Church",
-            subtitle: "A place of worship and community",
-            display_order: 1,
-            is_active: true
-          },
-          {
-            id: 2,
-            src: "/01.jpg",
-            title: "Join Our Congregation",
-            subtitle: "Experience fellowship and spiritual growth",
-            display_order: 2,
-            is_active: true
-          },
-          {
-            id: 3,
-            src: "/02.jpg",
-            title: "Sunday Services",
-            subtitle: "Come worship with us every Sunday",
-            display_order: 3,
-            is_active: true
-          },
-          {
-            id: 4,
-            src: "/03.jpg",
-            title: "Community Gathering",
-            subtitle: "Building relationships in faith",
-            display_order: 4,
-            is_active: true
-          },
-          {
-            id: 5,
-            src: "/001.jpg",
-            title: "Anglican Tradition",
-            subtitle: "Rooted in faith, growing in love",
-            display_order: 5,
-            is_active: true
-          }
-        ]);
+        console.error("Failed to fetch hero images, using local defaults:", error);
       } finally {
         setLoading(false);
       }
@@ -124,28 +116,28 @@ const HeroSection = () => {
     fetchHeroImages();
   }, []);
 
-  if (loading) {
+  if (loading && carouselImages.length === 0) {
     return (
-      <section id="home" className="relative min-h-screen flex items-center">
-        <div className="absolute inset-0 bg-gradient-to-br from-church-red to-red-800 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-            <p className="text-white text-lg">Loading...</p>
-          </div>
+      <section id="home" className="relative min-h-[85vh] flex items-center bg-church-navy">
+        <div className="container mx-auto px-4 text-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-church-gold border-t-transparent mx-auto mb-3"></div>
+          <p className="text-white/80 text-sm">Loading...</p>
         </div>
       </section>
     );
   }
 
   return (
-    <section id="home" className="relative min-h-screen flex items-center">
+    <section id="home" className="relative min-h-[88vh] lg:min-h-[92vh] flex items-center overflow-hidden bg-church-navy">
       {/* Carousel Background */}
       <div className="absolute inset-0">
         <Carousel
+          setApi={setApi}
           className="w-full h-full"
           plugins={[
             Autoplay({
-              delay: 5000,
+              delay: 6500,
+              stopOnInteraction: false,
             }),
           ]}
           opts={{
@@ -153,84 +145,95 @@ const HeroSection = () => {
             loop: true,
           }}
         >
-          <CarouselContent className="h-screen">
+          <CarouselContent className="h-[88vh] lg:h-[92vh]">
             {carouselImages.map((image, index) => (
-              <CarouselItem key={index} className="h-screen">
+              <CarouselItem key={image.id || index} className="h-full">
                 <div
                   className="w-full h-full bg-cover bg-center bg-no-repeat relative"
                   style={{
                     backgroundImage: `url(${image.src})`,
-                    backgroundColor: '#FF0000'
                   }}
                 >
+                  {/* Natural cinematic gradient: darker on left and bottom for seamless reading */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/30" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/25" />
 
-
-                  {/* Text overlay for each image */}
-                  <div className="absolute inset-0 flex items-center justify-center px-4 pb-32 md:pb-0">
-                    <div className="text-center max-w-4xl">
-                      <h2 className="text-3xl md:text-6xl font-bold text-white mb-4 leading-tight" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>
+                  {/* Authentic Editorial Content (Left-Aligned) */}
+                  <div className="relative h-full container mx-auto px-4 sm:px-6 lg:px-12 flex flex-col justify-center">
+                    <div className="max-w-2xl text-left pt-6 pb-20">
+                      <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.12]">
                         {image.title}
-                      </h2>
-                      <p className="text-lg md:text-2xl text-white leading-relaxed" style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.8)' }}>
+                      </h1>
+                      <p className="text-base sm:text-lg md:text-xl text-white/85 leading-relaxed mt-4 font-normal max-w-xl">
                         {image.subtitle}
                       </p>
+
+                      {/* Genuine Action Links */}
+                      <div className="mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
+                        <Link
+                          to="/about"
+                          className="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-church-gold hover:bg-church-gold-hover text-church-navy font-semibold text-sm transition-all shadow-md hover:shadow-lg"
+                        >
+                          <span>About the Diocese</span>
+                          <ArrowRight className="h-4 w-4" />
+                        </Link>
+                        <Link
+                          to="/projects"
+                          className="inline-flex items-center gap-2 px-6 py-3 rounded-md border border-white/40 hover:border-white bg-white/10 hover:bg-white/20 text-white font-medium text-sm backdrop-blur-xs transition-colors"
+                        >
+                          <span>Our Impact & Projects</span>
+                        </Link>
+                      </div>
                     </div>
-            </div>
+                  </div>
                 </div>
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="left-4 bg-white/20 border-white/30 text-white hover:bg-white/30" />
-          <CarouselNext className="right-4 bg-white/20 border-white/30 text-white hover:bg-white/30" />
         </Carousel>
       </div>
 
-      {/* Action Buttons and Service Info - Positioned at bottom */}
-      <div className="absolute bottom-4 md:bottom-8 left-0 right-0 z-10">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto">
-          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-4 md:mb-6">
-            <Button variant="hero" size="lg" className="text-base md:text-lg px-6 py-3 md:px-8 md:py-4">
-              <Calendar className="mr-2 h-4 w-4 md:h-5 md:w-5" />
-              Join Us Sunday
-            </Button>
-            <Button 
-              variant="outline" 
-              size="lg" 
-              className="text-base md:text-lg px-6 py-3 md:px-8 md:py-4 border-white text-black hover:bg-white hover:text-church-red"
-              onClick={() => {
-                const contactSection = document.getElementById('contact');
-                if (contactSection) {
-                  contactSection.scrollIntoView({ behavior: 'smooth' });
-                }
-              }}
+      {/* Bottom Bar: Slide Progress & Controls */}
+      <div className="absolute bottom-6 left-0 right-0 z-20 pointer-events-none">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-12 flex items-center justify-between pointer-events-auto">
+          {/* Slide Indicators */}
+          <div className="flex items-center gap-2">
+            {carouselImages.map((_, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => api?.scrollTo(idx)}
+                aria-label={`Go to slide ${idx + 1}`}
+                className={`transition-all duration-300 rounded-full ${
+                  current === idx
+                    ? "w-8 h-2 bg-church-gold"
+                    : "w-2 h-2 bg-white/50 hover:bg-white/80"
+                }`}
+              />
+            ))}
+          </div>
+
+          {/* Slide Counter & Arrow Buttons */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono text-white/70 mr-2 tracking-wider">
+              {String(current + 1).padStart(2, "0")} / {String(count || carouselImages.length).padStart(2, "0")}
+            </span>
+            <button
+              type="button"
+              onClick={() => api?.scrollPrev()}
+              aria-label="Previous slide"
+              className="p-2 rounded-full border border-white/25 bg-black/30 hover:bg-white/20 text-white transition-colors"
             >
-              <MapPin className="mr-2 h-4 w-4 md:h-5 md:w-5" />
-              Find Us
-            </Button>
-          </div>
-
-
-          </div>
-        </div>
-
-        {/* Sunday Services Section */}
-        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 w-[500px] bg-white/90 backdrop-blur-sm rounded-lg shadow-lg py-1">
-          <div className="px-2">
-            <h3 className="text-base font-bold text-church-red mb-1 text-center">
-              Sunday Services
-            </h3>
-            <div className="grid grid-cols-3 gap-0">
-              {services.map((service, index) => (
-                <div key={index} className="text-center">
-                  <h4 className="font-semibold text-foreground text-sm mb-1">{service.title}</h4>
-                  <div className="flex items-center justify-center text-church-red">
-                    <Clock className="h-3 w-3 mr-1" />
-                    <span className="text-sm font-medium">{service.time}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => api?.scrollNext()}
+              aria-label="Next slide"
+              className="p-2 rounded-full border border-white/25 bg-black/30 hover:bg-white/20 text-white transition-colors"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
           </div>
         </div>
       </div>

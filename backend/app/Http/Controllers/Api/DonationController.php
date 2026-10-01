@@ -62,12 +62,16 @@ class DonationController extends Controller
                 'type' => $donation->donation_type
             ]);
 
-            // Send email notification
-            $this->sendDonationEmail($donation);
+            // Send email notification (non-fatal if SMTP server is offline)
+            try {
+                $this->sendDonationEmail($donation);
+            } catch (\Exception $mailEx) {
+                Log::warning('Donation email delivery deferred: ' . $mailEx->getMessage());
+            }
 
             return response()->json([
                 'success' => true,
-                'message' => 'Thank you for your generous donation! We will contact you soon with payment instructions.',
+                'message' => 'Thank you for your generous pledge! We will contact you soon with confirmation details.',
                 'donation_id' => $donation->id
             ]);
 

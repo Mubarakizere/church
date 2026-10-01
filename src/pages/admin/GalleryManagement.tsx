@@ -120,24 +120,24 @@ const GalleryManagement = () => {
 
               if (saveResponse.ok) {
                 const saveResult = await saveResponse.json();
-                console.log(`✓ SUCCESS: Saved to gallery:`, saveResult);
+                console.log(`SUCCESS: Saved to gallery:`, saveResult);
                 successCount++;
               } else {
                 const errorData = await saveResponse.json();
-                console.error(`✗ FAILED to save ${file.name}:`, errorData);
+                console.error(`FAILED to save ${file.name}:`, errorData);
                 failCount++;
               }
             } else {
-              console.error(`✗ FAILED: Upload failed for ${file.name}: No URL returned`);
+              console.error(`FAILED: Upload failed for ${file.name}: No URL returned`);
               failCount++;
             }
           } else {
             const errorData = await uploadResponse.json();
-            console.error(`✗ FAILED: Upload request failed for ${file.name}:`, errorData);
+            console.error(`FAILED: Upload request failed for ${file.name}:`, errorData);
             failCount++;
           }
         } catch (error) {
-          console.error(`✗ ERROR uploading file ${file.name}:`, error);
+          console.error(`ERROR uploading file ${file.name}:`, error);
           failCount++;
         }
         
