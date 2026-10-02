@@ -12,12 +12,16 @@ class SchoolController extends Controller
 {
     /**
      * Display a listing of the schools.
-     *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
-        $schools = School::where('is_active', true)->get();
+        $query = School::query();
+        if (!$request->has('all') && !$request->has('admin')) {
+            $query->where('is_active', true);
+        }
+        $schools = $query->orderBy('name', 'asc')->get();
         return response()->json($schools);
     }
 
