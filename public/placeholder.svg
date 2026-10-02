@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="50%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0c1628" />
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)" />
+  <g opacity="0.08" stroke="#ffffff" stroke-width="1">
+    <circle cx="400" cy="230" r="160" fill="none" />
+    <circle cx="400" cy="230" r="120" fill="none" />
+    <circle cx="400" cy="230" r="80" fill="none" />
+  </g>
+  <g transform="translate(400, 210)">
+    <!-- Church Cross -->
+    <rect x="-6" y="-70" width="12" height="110" rx="4" fill="url(#gold)" />
+    <rect x="-40" y="-45" width="80" height="12" rx="4" fill="url(#gold)" />
+    <!-- Cathedral Gable outline -->
+    <path d="M -80 40 L 0 -30 L 80 40 Z" fill="none" stroke="url(#gold)" stroke-width="3" opacity="0.7" />
+    <circle cx="0" cy="0" r="8" fill="url(#gold)" />
+  </g>
+  <text x="400" y="320" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="#f8fafc" text-anchor="middle" letter-spacing="2">
+    EAR SHYOGWE DIOCESE
+  </text>
+  <text x="400" y="348" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="500" fill="#94a3b8" text-anchor="middle" letter-spacing="1">
+    FAITH, FELLOWSHIP &amp; SERVICE
+  </text>
+</svg>

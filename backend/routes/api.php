@@ -52,10 +52,11 @@ Route::get('news/{id}', [NewsController::class, 'show']);
 // Route to serve storage files via /api/storage/
 Route::get('storage/{path}', function ($path) {
     $filePath = storage_path('app/public/' . $path);
-    if (!file_exists($filePath)) {
-        abort(404);
+    if (file_exists($filePath) && is_file($filePath)) {
+        return response()->file($filePath);
     }
-    return response()->file($filePath);
+    // Redirect to production storage if file was uploaded on production
+    return redirect("https://earshyogwe.com/api/storage/{$path}");
 })->where('path', '.*');
 
 Route::get('events-test', function() {

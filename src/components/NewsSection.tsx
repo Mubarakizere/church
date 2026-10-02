@@ -19,11 +19,7 @@ interface News {
 }
 
 const resolveNewsImageUrl = (imagePath?: string) => {
-  if (!imagePath) return "/placeholder.svg";
-  if (imagePath.startsWith("http")) return imagePath;
-  const clean = imagePath.replace(/^\/+/, "").replace(/^storage\//, "");
-  // In dev, route through local or production storage
-  return apiUrls.storage(clean);
+  return buildStorageUrl(imagePath);
 };
 
 const NewsSection = () => {

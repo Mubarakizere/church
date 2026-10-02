@@ -66,9 +66,18 @@ export interface NewsArticle {
 }
 
 const resolveNewsImageUrl = (imagePath?: string): string => {
-  if (!imagePath) return "/placeholder.svg";
-  if (imagePath.startsWith("http")) return imagePath;
   return buildStorageUrl(imagePath);
+};
+
+const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>, originalPath?: string) => {
+  const img = e.currentTarget;
+  if (!img.dataset.triedLocal && originalPath && !originalPath.startsWith("http") && !originalPath.startsWith("blob:")) {
+    img.dataset.triedLocal = "true";
+    const clean = originalPath.replace(/^\/+/, "").replace(/^storage\//, "");
+    img.src = `http://localhost:8000/api/storage/${clean}`;
+  } else {
+    img.src = "/placeholder.svg";
+  }
 };
 
 const formatDate = (dateString?: string): string => {
@@ -889,9 +898,7 @@ export const NewsManagement: React.FC = () => {
                         src={coverUrl}
                         alt={article.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = "/placeholder.svg";
-                        }}
+                        onError={(e) => handleImageError(e, article.image)}
                       />
 
                       {/* Top Badges Overlay */}
@@ -1037,9 +1044,7 @@ export const NewsManagement: React.FC = () => {
                                 src={coverUrl}
                                 alt={article.title}
                                 className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  (e.target as HTMLImageElement).src = "/placeholder.svg";
-                                }}
+                                onError={(e) => handleImageError(e, article.image)}
                               />
                             </div>
                           </td>
@@ -1283,9 +1288,7 @@ export const NewsManagement: React.FC = () => {
                           src={resolveNewsImageUrl(formImage)}
                           alt="Cover preview"
                           className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = "/placeholder.svg";
-                          }}
+                          onError={(e) => handleImageError(e, formImage)}
                         />
                         <button
                           type="button"
@@ -1372,9 +1375,7 @@ export const NewsManagement: React.FC = () => {
                           src={resolveNewsImageUrl(imgUrl)}
                           alt={`Gallery ${idx + 1}`}
                           className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = "/placeholder.svg";
-                          }}
+                          onError={(e) => handleImageError(e, imgUrl)}
                         />
                         <button
                           type="button"

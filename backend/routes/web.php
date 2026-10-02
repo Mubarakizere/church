@@ -17,11 +17,11 @@ Route::get('/test', function () {
 Route::get('/storage/{path}', function ($path) {
     $filePath = storage_path('app/public/' . $path);
 
-    if (!file_exists($filePath)) {
-        abort(404);
+    if (file_exists($filePath) && is_file($filePath)) {
+        return response()->file($filePath);
     }
 
-    return response()->file($filePath);
+    return redirect("https://earshyogwe.com/storage/{$path}");
 })->where('path', '.*');
 
 Route::get('/run-migrate-izere', function () {

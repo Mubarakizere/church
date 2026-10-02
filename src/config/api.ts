@@ -68,11 +68,37 @@ export const buildApiUrl = (endpoint: string): string => {
 };
 
 // Helper function to build storage URLs (with /api prefix for production)
-export const buildStorageUrl = (path: string): string => {
-  // Normalize input: remove leading slash and any 'storage/' prefix
-  let cleanPath = path.replace(/^\//, '').replace(/^storage\//, '');
+export const buildStorageUrl = (path?: string | null): string => {
+  if (!path || typeof path !== 'string' || !path.trim()) {
+    return '/placeholder.svg';
+  }
 
-  // Always route storage through Laravel under /api to hit web.php route
+  const trimmed = path.trim();
+
+  // Handle blob URLs from previous browser sessions that are now invalid
+  if (trimmed.startsWith('blob:')) {
+    return '/placeholder.svg';
+  }
+
+  // Already a full external URL
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+
+  // Local static files in public folder
+  if (/^\/?(?:001|01|02|03|1)\.jpg$/i.test(trimmed) || /^\/?placeholder\.svg$/i.test(trimmed) || /^\/?logo/i.test(trimmed)) {
+    return trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+  }
+
+  // Normalize input: remove leading slash and any 'storage/' prefix
+  const cleanPath = trimmed.replace(/^\/+/, '').replace(/^storage\//, '');
+
+  // Direct fast CDN access for all stored images (supports HTTP/2, CORS, and eliminates local single-threaded blocking)
+  return `https://earshyogwe.com/api/storage/${cleanPath}`;
+};
+
+export const getLocalStorageUrl = (path: string): string => {
+  const cleanPath = path.replace(/^\/+/, '').replace(/^storage\//, '');
   const siteBase = apiConfig.baseURL.replace(/\/?api$/, '');
   return `${siteBase}/api/storage/${cleanPath}`;
 };
