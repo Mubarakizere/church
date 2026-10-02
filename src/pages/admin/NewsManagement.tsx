@@ -45,7 +45,11 @@ import {
   Image as ImageIcon,
   Loader2,
   AlertTriangle,
-  ArrowUpDown
+  ArrowUpDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -227,6 +231,31 @@ export const NewsManagement: React.FC = () => {
         return sortBy === "date-desc" ? timeB - timeA : timeA - timeB;
       });
   }, [articles, statusFilter, selectedAuthor, searchQuery, sortBy]);
+
+  // Pagination State & Calculations
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(9);
+
+  const totalItems = filteredArticles.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalItems);
+
+  const paginatedArticles = useMemo(() => {
+    return filteredArticles.slice(startIndex, startIndex + pageSize);
+  }, [filteredArticles, startIndex, pageSize]);
+
+  // Reset page when any filter or page size changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter, selectedAuthor, sortBy, pageSize]);
+
+  // Ensure current page remains within bounds
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
 
   // Open modal for Create
   const handleOpenCreate = () => {
@@ -883,7 +912,7 @@ export const NewsManagement: React.FC = () => {
           ) : viewMode === "grid" ? (
             /* Editorial Cards Grid View */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {filteredArticles.map((article) => {
+              {paginatedArticles.map((article) => {
                 const coverUrl = resolveNewsImageUrl(article.image);
                 const hasGallery = Array.isArray(article.images) && article.images.length > 0;
 
@@ -1029,7 +1058,7 @@ export const NewsManagement: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 font-medium">
-                    {filteredArticles.map((article) => {
+                    {paginatedArticles.map((article) => {
                       const coverUrl = resolveNewsImageUrl(article.image);
 
                       return (
@@ -1134,6 +1163,116 @@ export const NewsManagement: React.FC = () => {
                     })}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          )}
+
+          {/* Pagination Controls Bar */}
+          {totalItems > 0 && (
+            <div className="bg-white rounded-xl border border-slate-200 px-4 py-3 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+              {/* Record count indicator */}
+              <div className="text-xs text-slate-500 font-medium">
+                Showing <span className="font-bold text-church-navy">{totalItems === 0 ? 0 : startIndex + 1}</span> to{" "}
+                <span className="font-bold text-church-navy">{endIndex}</span> of{" "}
+                <span className="font-bold text-church-navy">{totalItems}</span> releases
+              </div>
+
+              {/* Rows per page selector */}
+              <div className="flex items-center gap-2 text-xs text-slate-500">
+                <span>Per page:</span>
+                <Select
+                  value={pageSize.toString()}
+                  onValueChange={(val) => setPageSize(Number(val))}
+                >
+                  <SelectTrigger className="h-8 w-18 text-xs border-slate-200">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="6">6 stories</SelectItem>
+                    <SelectItem value="9">9 stories</SelectItem>
+                    <SelectItem value="12">12 stories</SelectItem>
+                    <SelectItem value="18">18 stories</SelectItem>
+                    <SelectItem value="24">24 stories</SelectItem>
+                    <SelectItem value="36">36 stories</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Page navigation controls */}
+              <div className="flex items-center gap-1.5">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                  className="h-8 w-8 text-slate-600 hover:text-church-navy border-slate-200 disabled:opacity-40"
+                  title="First Page"
+                >
+                  <ChevronsLeft className="w-4 h-4" />
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="h-8 w-8 text-slate-600 hover:text-church-navy border-slate-200 disabled:opacity-40"
+                  title="Previous Page"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+
+                {/* Page numbers */}
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter((page) => {
+                      if (totalPages <= 5) return true;
+                      return Math.abs(page - currentPage) <= 1 || page === 1 || page === totalPages;
+                    })
+                    .map((page, idx, arr) => {
+                      const prev = arr[idx - 1];
+                      const hasGap = prev && page - prev > 1;
+
+                      return (
+                        <React.Fragment key={page}>
+                          {hasGap && <span className="px-1 text-slate-400 text-xs">...</span>}
+                          <button
+                            type="button"
+                            onClick={() => setCurrentPage(page)}
+                            className={`h-8 min-w-[32px] px-2 rounded-md text-xs font-semibold transition-colors ${
+                              currentPage === page
+                                ? "bg-church-navy text-white shadow-xs"
+                                : "text-slate-600 hover:bg-slate-100 hover:text-church-navy border border-transparent"
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        </React.Fragment>
+                      );
+                    })}
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="h-8 w-8 text-slate-600 hover:text-church-navy border-slate-200 disabled:opacity-40"
+                  title="Next Page"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setCurrentPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                  className="h-8 w-8 text-slate-600 hover:text-church-navy border-slate-200 disabled:opacity-40"
+                  title="Last Page"
+                >
+                  <ChevronsRight className="w-4 h-4" />
+                </Button>
               </div>
             </div>
           )}

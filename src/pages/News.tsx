@@ -8,6 +8,7 @@ import {
   User, 
   Search, 
   ChevronRight, 
+  ChevronLeft,
   ArrowRight, 
   X, 
   Share2, 
@@ -181,6 +182,26 @@ export default function News() {
     // In default view, if lead is highlighted above, show the remaining articles in the grid
     return filteredNews.filter((item) => item.id !== leadArticle?.id);
   }, [filteredNews, leadArticle, searchQuery, activeFilter]);
+
+  // Pagination for Public News
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 9;
+
+  const totalPages = Math.max(1, Math.ceil(gridArticles.length / pageSize));
+  const startIndex = (currentPage - 1) * pageSize;
+  const paginatedGridArticles = useMemo(() => {
+    return gridArticles.slice(startIndex, startIndex + pageSize);
+  }, [gridArticles, startIndex, pageSize]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, activeFilter]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
 
   return (
     <div className="min-h-screen bg-white flex flex-col font-sans">
@@ -384,7 +405,7 @@ export default function News() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {gridArticles.map((article) => (
+                {paginatedGridArticles.map((article) => (
                   <article
                     key={article.id}
                     className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col justify-between group"
@@ -448,6 +469,67 @@ export default function News() {
                     </div>
                   </article>
                 ))}
+              </div>
+            )}
+
+            {/* Public Pagination Bar */}
+            {gridArticles.length > pageSize && (
+              <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-slate-200">
+                <p className="text-xs text-slate-500 font-medium">
+                  Showing <span className="font-bold text-church-navy">{startIndex + 1}</span> to{" "}
+                  <span className="font-bold text-church-navy">{Math.min(startIndex + pageSize, gridArticles.length)}</span> of{" "}
+                  <span className="font-bold text-church-navy">{gridArticles.length}</span> articles
+                </p>
+
+                <div className="flex items-center gap-1.5">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setCurrentPage((p) => Math.max(1, p - 1));
+                      window.scrollTo({ top: 400, behavior: "smooth" });
+                    }}
+                    disabled={currentPage === 1}
+                    className="h-9 px-3 text-xs text-slate-700 hover:text-church-navy border-slate-200 disabled:opacity-40"
+                  >
+                    <ChevronLeft className="w-4 h-4 mr-1" />
+                    Previous
+                  </Button>
+
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <button
+                        key={page}
+                        type="button"
+                        onClick={() => {
+                          setCurrentPage(page);
+                          window.scrollTo({ top: 400, behavior: "smooth" });
+                        }}
+                        className={`h-9 min-w-[36px] px-2.5 rounded-lg text-xs font-bold transition-colors ${
+                          currentPage === page
+                            ? "bg-church-navy text-white shadow-xs"
+                            : "text-slate-600 hover:bg-slate-100 border border-transparent"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                  </div>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setCurrentPage((p) => Math.min(totalPages, p + 1));
+                      window.scrollTo({ top: 400, behavior: "smooth" });
+                    }}
+                    disabled={currentPage === totalPages}
+                    className="h-9 px-3 text-xs text-slate-700 hover:text-church-navy border-slate-200 disabled:opacity-40"
+                  >
+                    Next
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </div>
               </div>
             )}
 
