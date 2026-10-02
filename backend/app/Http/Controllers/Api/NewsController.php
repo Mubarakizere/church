@@ -23,10 +23,22 @@ class NewsController extends Controller
 
             // Filter by status if provided
             if ($request->has('status')) {
-                $query->where('status', $request->status);
+                if ($request->status !== 'all') {
+                    $query->where('status', $request->status);
+                }
             } else {
                 // Default to published news for public access
                 $query->published();
+            }
+
+            // Search by term if provided
+            if ($request->filled('search')) {
+                $search = $request->get('search');
+                $query->where(function($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                      ->orWhere('summary', 'like', "%{$search}%")
+                      ->orWhere('author', 'like', "%{$search}%");
+                });
             }
 
             // Filter by featured
@@ -35,12 +47,12 @@ class NewsController extends Controller
             }
 
             // Limit if provided
-            $limit = $request->get('limit', 20);
-            if ($limit > 0) {
-                $query->limit($limit);
+            $limit = $request->get('limit', 100);
+            if ($limit > 0 && $limit !== 'all') {
+                $query->limit((int)$limit);
             }
 
-            $news = $query->orderBy('published_at', 'desc')->get();
+            $news = $query->orderBy('published_at', 'desc')->orderBy('created_at', 'desc')->get();
             
             return response()->json([
                 'success' => true,

@@ -84,10 +84,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     // Quick load counts for badges
     Promise.all([
       fetch(apiUrls.schools()).then((r) => r.json()).catch(() => null),
-      fetch(apiUrls.news()).then((r) => r.json()).catch(() => null)
+      fetch(`${apiUrls.news()}?status=all`).then((r) => r.json()).catch(() => null)
     ]).then(([sch, nws]) => {
       const schCount = Array.isArray(sch?.data || sch) ? (sch?.data || sch).length : 38;
-      const newsCount = Array.isArray(nws?.data || nws) ? (nws?.data || nws).length : 20;
+      const newsCount = typeof nws?.total === "number" ? nws.total : (Array.isArray(nws?.data) ? nws.data.length : 33);
       setStats((prev) => ({ ...prev, schools: schCount, news: newsCount }));
     }).catch(() => {});
   }, []);
