@@ -19,8 +19,14 @@ class GalleryController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = Gallery::query()->active()->ordered();
-            $images = $query->get();
+            $query = Gallery::query();
+
+            // Only filter to active images if not requesting all
+            if (!$request->boolean('all') && $request->input('status') !== 'all') {
+                $query->active();
+            }
+
+            $images = $query->ordered()->get();
 
             return response()->json([
                 'success' => true,
