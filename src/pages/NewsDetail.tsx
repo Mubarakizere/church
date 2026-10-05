@@ -15,7 +15,7 @@ import {
   Building2,
   Clock
 } from "lucide-react";
-import { apiUrls } from "@/config/api";
+import { apiUrls, buildStorageUrl } from "@/config/api";
 import { toast } from "sonner";
 
 interface NewsItem {

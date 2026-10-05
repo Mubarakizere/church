@@ -16,7 +16,7 @@ import {
   Mail
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { apiUrls } from "@/config/api";
+import { apiUrls, buildStorageUrl } from "@/config/api";
 
 interface NewsItem {
   id: number;

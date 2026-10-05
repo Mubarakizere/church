@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Calendar, User, ArrowRight, Newspaper } from "lucide-react";
-import { apiUrls } from "@/config/api";
+import { apiUrls, buildStorageUrl } from "@/config/api";
 
 interface News {
   id: number;

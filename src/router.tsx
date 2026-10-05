@@ -16,7 +16,7 @@ import EventDetail from "./pages/EventDetail";
 import News from "./pages/News";
 import NewsDetail from "./pages/NewsDetail";
 import Gallery from "./pages/Gallery";
-import AdminEvents from "./pages/AdminEvents";
+import EventsManagement from "./pages/admin/EventsManagement";
 import NewsManagement from "./pages/admin/NewsManagement";
 import AdminMembers from "./pages/AdminMembers";
 import AdminPages from "./pages/AdminPages";
@@ -86,7 +86,7 @@ export const router = createBrowserRouter(
     { path: "/admin/projects", element: <ProjectsOverview /> },
     { path: "/admin/programs", element: <ProjectsManagement /> },
     { path: "/admin/content", element: <ContentManagement /> },
-    { path: "/admin/events", element: <AdminEvents /> },
+    { path: "/admin/events", element: <EventsManagement /> },
     { path: "/admin/news", element: <NewsManagement /> },
     { path: "/admin/gallery", element: <GalleryManagement /> },
     { path: "/admin/documents", element: <DocumentsManagement /> },
