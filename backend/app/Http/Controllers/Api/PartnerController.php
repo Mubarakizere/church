@@ -14,10 +14,16 @@ class PartnerController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $partners = Partner::active()->ordered()->get();
+            $query = Partner::query();
+
+            if (!$request->boolean('all') && $request->input('status') !== 'all') {
+                $query->active();
+            }
+
+            $partners = $query->ordered()->get();
             
             return response()->json([
                 'success' => true,
