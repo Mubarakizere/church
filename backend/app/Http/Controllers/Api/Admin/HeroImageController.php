@@ -44,6 +44,7 @@ class HeroImageController extends Controller
             'subtitle' => 'required|string|max:500',
             'display_order' => 'required|integer|min:1',
             'is_active' => 'boolean',
+            'src' => 'nullable|string|max:1000',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:66560', // 65MB
         ]);
 
@@ -57,12 +58,14 @@ class HeroImageController extends Controller
         try {
             $data = $request->only(['title', 'subtitle', 'display_order', 'is_active']);
             
-            // Handle image upload
+            // Handle image upload or provided src
             if ($request->hasFile('image')) {
                 Log::info('Hero image file detected:', ['file' => $request->file('image')->getClientOriginalName()]);
                 $imagePath = $request->file('image')->store('hero-images', 'public');
                 $data['src'] = '/storage/' . $imagePath;
                 Log::info('Hero image stored at:', ['path' => $data['src']]);
+            } elseif ($request->filled('src')) {
+                $data['src'] = $request->input('src');
             } else {
                 // Use placeholder or default image
                 $data['src'] = '/placeholder.svg';
@@ -123,6 +126,7 @@ class HeroImageController extends Controller
             'subtitle' => 'sometimes|required|string|max:500',
             'display_order' => 'sometimes|required|integer|min:1',
             'is_active' => 'sometimes|boolean',
+            'src' => 'nullable|string|max:1000',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:66560', // 65MB
         ]);
 
@@ -159,7 +163,7 @@ class HeroImageController extends Controller
                 }
             }
             
-            // Handle image upload
+            // Handle image upload or provided src
             if ($request->hasFile('image')) {
                 Log::info('Hero image update file detected:', ['file' => $request->file('image')->getClientOriginalName()]);
                 
@@ -174,6 +178,8 @@ class HeroImageController extends Controller
                 $imagePath = $request->file('image')->store('hero-images', 'public');
                 $data['src'] = '/storage/' . $imagePath;
                 Log::info('Hero image updated at:', ['path' => $data['src']]);
+            } elseif ($request->filled('src')) {
+                $data['src'] = $request->input('src');
             }
 
             Log::info('Updating hero image with data:', $data);

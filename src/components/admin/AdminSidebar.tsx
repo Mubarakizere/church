@@ -64,7 +64,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     health: 7,
     news: 20,
     events: 9,
-    gallery: 32
+    gallery: 32,
+    heroImages: 5
   });
 
   useEffect(() => {
@@ -87,13 +88,22 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       fetch(apiUrls.schools()).then((r) => r.json()).catch(() => null),
       fetch(`${apiUrls.news()}?status=all`).then((r) => r.json()).catch(() => null),
       fetch(apiUrls.events()).then((r) => r.json()).catch(() => null),
-      fetch(`${apiUrls.gallery()}?all=true`).then((r) => r.json()).catch(() => null)
-    ]).then(([sch, nws, evt, gal]) => {
+      fetch(`${apiUrls.gallery()}?all=true`).then((r) => r.json()).catch(() => null),
+      fetch(apiUrls.heroImages()).then((r) => r.json()).catch(() => null)
+    ]).then(([sch, nws, evt, gal, her]) => {
       const schCount = Array.isArray(sch?.data || sch) ? (sch?.data || sch).length : 38;
       const newsCount = typeof nws?.total === "number" ? nws.total : (Array.isArray(nws?.data) ? nws.data.length : 33);
       const eventsCount = Array.isArray(evt?.data || evt) ? (evt?.data || evt).length : 9;
       const galleryCount = Array.isArray(gal?.data || gal) ? (gal?.data || gal).length : 32;
-      setStats((prev) => ({ ...prev, schools: schCount, news: newsCount, events: eventsCount, gallery: galleryCount }));
+      const heroCount = Array.isArray(her?.data || her) ? (her?.data || her).length : 5;
+      setStats((prev) => ({
+        ...prev,
+        schools: schCount,
+        news: newsCount,
+        events: eventsCount,
+        gallery: galleryCount,
+        heroImages: heroCount
+      }));
     }).catch(() => {});
   }, []);
 
@@ -179,7 +189,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           label: "Hero Carousel Banners",
           path: "/admin/hero-images",
           icon: ImageIcon,
-          badge: null
+          badge: stats.heroImages.toString()
         },
         {
           label: "Partners & Donors",
