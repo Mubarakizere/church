@@ -67,7 +67,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     gallery: 32,
     heroImages: 5,
     partners: 11,
-    documents: 8
+    documents: 8,
+    secureDocs: 6
   });
 
   useEffect(() => {
@@ -93,8 +94,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       fetch(`${apiUrls.gallery()}?all=true`).then((r) => r.json()).catch(() => null),
       fetch(apiUrls.heroImages()).then((r) => r.json()).catch(() => null),
       fetch(`${apiUrls.partners()}?all=true`).then((r) => r.json()).catch(() => null),
-      fetch(apiUrls.documents()).then((r) => r.json()).catch(() => null)
-    ]).then(([sch, nws, evt, gal, her, prt, doc]) => {
+      fetch(apiUrls.documents()).then((r) => r.json()).catch(() => null),
+      fetch(apiUrls.secureDocuments()).then((r) => r.json()).catch(() => null)
+    ]).then(([sch, nws, evt, gal, her, prt, doc, sdoc]) => {
       const schCount = Array.isArray(sch?.data || sch) ? (sch?.data || sch).length : 38;
       const newsCount = typeof nws?.total === "number" ? nws.total : (Array.isArray(nws?.data) ? nws.data.length : 33);
       const eventsCount = Array.isArray(evt?.data || evt) ? (evt?.data || evt).length : 9;
@@ -102,6 +104,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       const heroCount = Array.isArray(her?.data || her) ? (her?.data || her).length : 5;
       const partnerCount = Array.isArray(prt?.data || prt) ? (prt?.data || prt).length : 11;
       const docCount = Array.isArray(doc?.data || doc) ? (doc?.data || doc).length : 8;
+      const sdocCount = Array.isArray(sdoc?.data || sdoc) ? (sdoc?.data || sdoc).length : 6;
       setStats((prev) => ({
         ...prev,
         schools: schCount,
@@ -110,7 +113,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         gallery: galleryCount,
         heroImages: heroCount,
         partners: partnerCount,
-        documents: docCount
+        documents: docCount,
+        secureDocs: sdocCount
       }));
     }).catch(() => {});
   }, []);
@@ -211,7 +215,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       id: "documents",
       title: "Documents & Archives",
       icon: FileText,
-      badge: stats.documents.toString(),
+      badge: (stats.documents + stats.secureDocs).toString(),
       items: [
         {
           label: "Official Documents",
@@ -223,7 +227,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           label: "Secure & Protected Docs",
           path: "/admin/secure-documents",
           icon: Lock,
-          badge: null
+          badge: stats.secureDocs.toString()
         }
       ]
     },
