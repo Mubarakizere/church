@@ -11,6 +11,15 @@
     RewriteCond %{REQUEST_URI} !^/api/
     RewriteRule . /index.html [L]
     
+    # Fallback all server errors to React SPA router
+    ErrorDocument 400 /index.html
+    ErrorDocument 401 /index.html
+    ErrorDocument 403 /index.html
+    ErrorDocument 404 /index.html
+    ErrorDocument 500 /index.html
+    ErrorDocument 502 /index.html
+    ErrorDocument 503 /index.html
+
     # API routing to Laravel backend
     RewriteRule ^api/(.*)$ /api/index.php [L,QSA]
 </IfModule>

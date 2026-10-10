@@ -45,6 +45,8 @@ import UsersManagement from "./pages/admin/UsersManagement";
 import Documents from "./pages/Documents";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RootLayout from "./components/RootLayout";
+import ErrorPage from "./pages/ErrorPage";
+import ErrorShowcasePage from "./pages/ErrorShowcasePage";
 
 // Create router with future flags enabled
 export const router = createBrowserRouter(
@@ -98,6 +100,22 @@ export const router = createBrowserRouter(
     { path: "/admin/members", element: <AdminMembers /> },
     { path: "/admin/pages", element: <AdminPages /> },
     { path: "/admin/analytics", element: <AdminAnalytics /> },
+    { path: "/error", element: <ErrorShowcasePage /> },
+    { path: "/error/:code", element: <ErrorPage /> },
+    { path: "/400", element: <ErrorPage fixedCode="400" /> },
+    { path: "/401", element: <ErrorPage fixedCode="401" /> },
+    { path: "/403", element: <ErrorPage fixedCode="403" /> },
+    { path: "/404", element: <NotFound /> },
+    { path: "/408", element: <ErrorPage fixedCode="408" /> },
+    { path: "/410", element: <ErrorPage fixedCode="410" /> },
+    { path: "/429", element: <ErrorPage fixedCode="429" /> },
+    { path: "/500", element: <ErrorPage fixedCode="500" /> },
+    { path: "/502", element: <ErrorPage fixedCode="502" /> },
+    { path: "/503", element: <ErrorPage fixedCode="503" /> },
+    { path: "/504", element: <ErrorPage fixedCode="504" /> },
+    { path: "/offline", element: <ErrorPage fixedCode="offline" /> },
+    { path: "/maintenance", element: <ErrorPage fixedCode="maintenance" /> },
+    { path: "/session-expired", element: <ErrorPage fixedCode="session-expired" /> },
     { path: "*", element: <NotFound /> }
       ]
     }

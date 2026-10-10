@@ -35,3 +35,7 @@ backend/storage/*.key
 *.njsproj
 *.sln
 *.sw?
+
+# Local Deployment Guidance (do not commit)
+SHARED_HOSTING_GUIDE.md
+*HOSTING*GUIDE*.md
