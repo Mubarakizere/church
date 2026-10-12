@@ -16,7 +16,8 @@ import {
   Mail
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { apiUrls, buildStorageUrl } from "@/config/api";
+import { apiUrls } from "@/config/api";
+import { getArticleImage, getArticleFallbackImage } from "@/utils/newsImageUtils";
 
 interface NewsItem {
   id: number;
@@ -34,8 +35,8 @@ interface NewsItem {
   updated_at: string;
 }
 
-const resolveNewsImageUrl = (imagePath?: string) => {
-  return buildStorageUrl(imagePath);
+const resolveNewsImageUrl = (imagePath?: string, id?: number | string) => {
+  return getArticleImage(imagePath, id);
 };
 
 const formatDate = (dateString?: string) => {
@@ -253,11 +254,13 @@ export default function News() {
               <div className="bg-slate-50 rounded-3xl border border-slate-200/90 overflow-hidden shadow-2xs hover:shadow-md transition-all duration-300 grid grid-cols-1 lg:grid-cols-12 group">
                 <div className="lg:col-span-7 relative h-64 sm:h-80 lg:h-full min-h-[280px] overflow-hidden bg-slate-900">
                   <img
-                    src={resolveNewsImageUrl(leadArticle.image)}
+                    src={resolveNewsImageUrl(leadArticle.image, leadArticle.id)}
                     alt={leadArticle.title}
                     className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = "/01.jpg";
+                      const target = e.currentTarget;
+                      target.onerror = null;
+                      target.src = getArticleFallbackImage(leadArticle.id);
                     }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent lg:hidden" />
@@ -414,11 +417,13 @@ export default function News() {
                       {/* Image Thumbnail */}
                       <Link to={`/news/${article.slug}`} className="block relative h-48 w-full overflow-hidden bg-slate-100">
                         <img
-                          src={resolveNewsImageUrl(article.image)}
+                          src={resolveNewsImageUrl(article.image, article.id)}
                           alt={article.title}
                           className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                           onError={(e) => {
-                            (e.target as HTMLImageElement).src = "/01.jpg";
+                            const target = e.currentTarget;
+                            target.onerror = null;
+                            target.src = getArticleFallbackImage(article.id);
                           }}
                         />
                         {article.featured && (

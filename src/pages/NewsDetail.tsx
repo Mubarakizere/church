@@ -15,7 +15,8 @@ import {
   Building2,
   Clock
 } from "lucide-react";
-import { apiUrls, buildStorageUrl } from "@/config/api";
+import { apiUrls } from "@/config/api";
+import { getArticleImage, getArticleFallbackImage } from "@/utils/newsImageUtils";
 import { toast } from "sonner";
 
 interface NewsItem {
@@ -34,8 +35,8 @@ interface NewsItem {
   updated_at: string;
 }
 
-const resolveNewsImageUrl = (imagePath?: string) => {
-  return buildStorageUrl(imagePath);
+const resolveNewsImageUrl = (imagePath?: string, id?: number | string) => {
+  return getArticleImage(imagePath, id);
 };
 
 const formatDate = (dateString?: string) => {
@@ -243,11 +244,13 @@ export default function NewsDetail() {
             {news.image && (
               <div className="mb-8 rounded-2xl overflow-hidden border border-slate-200/90 shadow-2xs bg-slate-100">
                 <img
-                  src={resolveNewsImageUrl(news.image)}
+                  src={resolveNewsImageUrl(news.image, news.id)}
                   alt={news.title}
                   className="w-full h-auto max-h-[500px] object-cover object-center"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = "/01.jpg";
+                    const target = e.currentTarget;
+                    target.onerror = null;
+                    target.src = getArticleFallbackImage(news.id);
                   }}
                 />
               </div>

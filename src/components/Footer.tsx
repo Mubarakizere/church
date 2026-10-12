@@ -50,12 +50,12 @@ const Footer: React.FC = () => {
           
           {/* Column 1: Diocese Identity & Mission (Span 4) */}
           <div className="lg:col-span-4 space-y-5">
-            <Link to="/" className="flex items-center gap-3.5 group w-fit">
-              <div className="relative">
+            <Link to="/" className="flex items-center gap-3 group w-fit">
+              <div className="relative shrink-0 w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14">
                 <img
                   src="/logo for chuch.jpg"
                   alt="Anglican Church of Rwanda, Shyogwe Diocese Emblem"
-                  className="w-13 h-13 sm:w-14 sm:h-14 object-contain rounded-full border-2 border-church-gold/50 shadow-md group-hover:border-church-gold transition-colors duration-300"
+                  className="w-full h-full object-contain rounded-full border-2 border-church-gold/50 shadow-md group-hover:border-church-gold transition-colors duration-300"
                 />
               </div>
               <div className="leading-tight">

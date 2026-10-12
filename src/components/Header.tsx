@@ -71,6 +71,17 @@ const Header = () => {
     return items.some((item) => location.pathname === item.href);
   };
 
+  // Auto-expand the active section when mobile navigation opens
+  useEffect(() => {
+    if (isMenuOpen) {
+      setMobileExpanded({
+        about: isGroupActive(NAV_GROUPS.about),
+        ministries: isGroupActive(NAV_GROUPS.ministries),
+        media: isGroupActive(NAV_GROUPS.media),
+      });
+    }
+  }, [isMenuOpen, location.pathname]);
+
   return (
     <header className="bg-white/95 backdrop-blur-md border-b border-church-cream/80 shadow-soft sticky top-0 z-50">
       <div className="container mx-auto px-4 py-2.5">
@@ -291,13 +302,16 @@ const Header = () => {
           <nav className="lg:hidden mt-3 pb-4 border-t border-church-cream pt-3 space-y-2 font-medium text-sm animate-in fade-in duration-200">
             <Link
               to="/"
-              className={`block px-3 py-2 rounded-lg transition-colors ${
+              className={`flex items-center justify-between px-3.5 py-2.5 rounded-lg transition-all ${
                 location.pathname === "/"
-                  ? "bg-church-cream text-church-gold font-semibold"
+                  ? "bg-church-cream/80 text-church-navy font-bold border-l-4 border-church-gold shadow-2xs"
                   : "text-church-navy hover:bg-church-cream/50"
               }`}
             >
-              Home
+              <span>Home</span>
+              {location.pathname === "/" && (
+                <span className="w-2 h-2 rounded-full bg-church-gold" />
+              )}
             </Link>
 
             {/* Mobile About Group */}
@@ -305,28 +319,42 @@ const Header = () => {
               <button
                 type="button"
                 onClick={() => toggleMobileGroup("about")}
-                className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-church-navy hover:bg-church-cream/50 transition-colors"
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg transition-all ${
+                  isGroupActive(NAV_GROUPS.about)
+                    ? "bg-church-cream/60 text-church-navy font-bold border-l-4 border-church-gold"
+                    : "text-church-navy hover:bg-church-cream/50"
+                }`}
               >
-                <span>About</span>
+                <span className="flex items-center gap-2">
+                  <span>About</span>
+                  {isGroupActive(NAV_GROUPS.about) && (
+                    <span className="text-[10px] font-bold text-church-gold uppercase tracking-wider bg-church-gold/15 px-1.5 py-0.5 rounded">
+                      Active
+                    </span>
+                  )}
+                </span>
                 <ChevronDown
-                  className={`h-4 w-4 transition-transform duration-200 ${
+                  className={`h-4 w-4 transition-transform duration-200 text-church-gold ${
                     mobileExpanded.about ? "rotate-180" : ""
                   }`}
                 />
               </button>
               {mobileExpanded.about && (
-                <div className="pl-4 pr-2 py-1 space-y-1 bg-church-cream/30 rounded-lg mt-1">
+                <div className="pl-3 pr-2 py-1.5 space-y-1 bg-church-cream/25 rounded-lg mt-1 border-l-2 border-church-gold/30">
                   {NAV_GROUPS.about.map((item) => (
                     <Link
                       key={item.href}
                       to={item.href}
-                      className={`block px-3 py-1.5 text-xs rounded-md ${
+                      className={`flex items-center justify-between px-3 py-2 text-xs rounded-md transition-all ${
                         location.pathname === item.href
-                          ? "text-church-gold font-semibold"
-                          : "text-church-charcoal hover:text-church-gold"
+                          ? "bg-white text-church-navy font-bold border-l-3 border-church-gold shadow-xs"
+                          : "text-church-charcoal hover:text-church-gold hover:bg-white/60"
                       }`}
                     >
-                      {item.name}
+                      <span>{item.name}</span>
+                      {location.pathname === item.href && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-church-gold" />
+                      )}
                     </Link>
                   ))}
                 </div>
@@ -338,28 +366,42 @@ const Header = () => {
               <button
                 type="button"
                 onClick={() => toggleMobileGroup("ministries")}
-                className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-church-navy hover:bg-church-cream/50 transition-colors"
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg transition-all ${
+                  isGroupActive(NAV_GROUPS.ministries)
+                    ? "bg-church-cream/60 text-church-navy font-bold border-l-4 border-church-gold"
+                    : "text-church-navy hover:bg-church-cream/50"
+                }`}
               >
-                <span>Ministries & Projects</span>
+                <span className="flex items-center gap-2">
+                  <span>Ministries & Projects</span>
+                  {isGroupActive(NAV_GROUPS.ministries) && (
+                    <span className="text-[10px] font-bold text-church-gold uppercase tracking-wider bg-church-gold/15 px-1.5 py-0.5 rounded">
+                      Active
+                    </span>
+                  )}
+                </span>
                 <ChevronDown
-                  className={`h-4 w-4 transition-transform duration-200 ${
+                  className={`h-4 w-4 transition-transform duration-200 text-church-gold ${
                     mobileExpanded.ministries ? "rotate-180" : ""
                   }`}
                 />
               </button>
               {mobileExpanded.ministries && (
-                <div className="pl-4 pr-2 py-1 space-y-1 bg-church-cream/30 rounded-lg mt-1">
+                <div className="pl-3 pr-2 py-1.5 space-y-1 bg-church-cream/25 rounded-lg mt-1 border-l-2 border-church-gold/30">
                   {NAV_GROUPS.ministries.map((item) => (
                     <Link
                       key={item.href}
                       to={item.href}
-                      className={`block px-3 py-1.5 text-xs rounded-md ${
+                      className={`flex items-center justify-between px-3 py-2 text-xs rounded-md transition-all ${
                         location.pathname === item.href
-                          ? "text-church-gold font-semibold"
-                          : "text-church-charcoal hover:text-church-gold"
+                          ? "bg-white text-church-navy font-bold border-l-3 border-church-gold shadow-xs"
+                          : "text-church-charcoal hover:text-church-gold hover:bg-white/60"
                       }`}
                     >
-                      {item.name}
+                      <span>{item.name}</span>
+                      {location.pathname === item.href && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-church-gold" />
+                      )}
                     </Link>
                   ))}
                 </div>
@@ -371,28 +413,42 @@ const Header = () => {
               <button
                 type="button"
                 onClick={() => toggleMobileGroup("media")}
-                className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-church-navy hover:bg-church-cream/50 transition-colors"
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg transition-all ${
+                  isGroupActive(NAV_GROUPS.media)
+                    ? "bg-church-cream/60 text-church-navy font-bold border-l-4 border-church-gold"
+                    : "text-church-navy hover:bg-church-cream/50"
+                }`}
               >
-                <span>Media & Resources</span>
+                <span className="flex items-center gap-2">
+                  <span>Media & Resources</span>
+                  {isGroupActive(NAV_GROUPS.media) && (
+                    <span className="text-[10px] font-bold text-church-gold uppercase tracking-wider bg-church-gold/15 px-1.5 py-0.5 rounded">
+                      Active
+                    </span>
+                  )}
+                </span>
                 <ChevronDown
-                  className={`h-4 w-4 transition-transform duration-200 ${
+                  className={`h-4 w-4 transition-transform duration-200 text-church-gold ${
                     mobileExpanded.media ? "rotate-180" : ""
                   }`}
                 />
               </button>
               {mobileExpanded.media && (
-                <div className="pl-4 pr-2 py-1 space-y-1 bg-church-cream/30 rounded-lg mt-1">
+                <div className="pl-3 pr-2 py-1.5 space-y-1 bg-church-cream/25 rounded-lg mt-1 border-l-2 border-church-gold/30">
                   {NAV_GROUPS.media.map((item) => (
                     <Link
                       key={item.href}
                       to={item.href}
-                      className={`block px-3 py-1.5 text-xs rounded-md ${
+                      className={`flex items-center justify-between px-3 py-2 text-xs rounded-md transition-all ${
                         location.pathname === item.href
-                          ? "text-church-gold font-semibold"
-                          : "text-church-charcoal hover:text-church-gold"
+                          ? "bg-white text-church-navy font-bold border-l-3 border-church-gold shadow-xs"
+                          : "text-church-charcoal hover:text-church-gold hover:bg-white/60"
                       }`}
                     >
-                      {item.name}
+                      <span>{item.name}</span>
+                      {location.pathname === item.href && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-church-gold" />
+                      )}
                     </Link>
                   ))}
                 </div>
@@ -401,13 +457,16 @@ const Header = () => {
 
             <Link
               to="/contact"
-              className={`block px-3 py-2 rounded-lg transition-colors ${
+              className={`flex items-center justify-between px-3.5 py-2.5 rounded-lg transition-all ${
                 location.pathname === "/contact"
-                  ? "bg-church-cream text-church-gold font-semibold"
+                  ? "bg-church-cream/80 text-church-navy font-bold border-l-4 border-church-gold shadow-2xs"
                   : "text-church-navy hover:bg-church-cream/50"
               }`}
             >
-              Contact
+              <span>Contact</span>
+              {location.pathname === "/contact" && (
+                <span className="w-2 h-2 rounded-full bg-church-gold" />
+              )}
             </Link>
           </nav>
         )}

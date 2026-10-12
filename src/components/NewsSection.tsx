@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Calendar, User, ArrowRight, Newspaper } from "lucide-react";
-import { apiUrls, buildStorageUrl } from "@/config/api";
+import { apiUrls } from "@/config/api";
+import { getArticleImage, getArticleFallbackImage } from "@/utils/newsImageUtils";
 
 interface News {
   id: number;
@@ -18,8 +19,8 @@ interface News {
   updated_at: string;
 }
 
-const resolveNewsImageUrl = (imagePath?: string) => {
-  return buildStorageUrl(imagePath);
+const resolveNewsImageUrl = (imagePath?: string, id?: number | string) => {
+  return getArticleImage(imagePath, id);
 };
 
 const NewsSection = () => {
@@ -154,18 +155,13 @@ const NewsSection = () => {
                   className="relative aspect-[16/10] overflow-hidden bg-church-cream/60 block"
                 >
                   <img
-                    src={resolveNewsImageUrl(item.image)}
+                    src={resolveNewsImageUrl(item.image, item.id)}
                     alt={item.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     onError={(e) => {
                       const img = e.currentTarget;
-                      if (!img.dataset.triedProduction && item.image) {
-                        img.dataset.triedProduction = "true";
-                        const clean = item.image.replace(/^\/+/, "").replace(/^storage\//, "");
-                        img.src = `https://earshyogwe.com/api/storage/${clean}`;
-                      } else {
-                        img.src = "/placeholder.svg";
-                      }
+                      img.onerror = null;
+                      img.src = getArticleFallbackImage(item.id);
                     }}
                   />
                   {item.featured && (
