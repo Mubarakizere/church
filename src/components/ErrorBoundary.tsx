@@ -1,4 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from "react";
+import { BrowserRouter } from "react-router-dom";
 import ErrorLandingLayout from "./ErrorLandingLayout";
 import { ERROR_PAGES_DATA } from "@/config/errorPagesData";
 
@@ -29,13 +30,15 @@ class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <ErrorLandingLayout
-          errorCode="500"
-          errorConfig={ERROR_PAGES_DATA["500"]}
-          customError={this.state.error}
-          customComponentStack={this.state.errorInfo?.componentStack}
-          requestedUrl={typeof window !== "undefined" ? window.location.pathname : "/"}
-        />
+        <BrowserRouter>
+          <ErrorLandingLayout
+            errorCode="500"
+            errorConfig={ERROR_PAGES_DATA["500"]}
+            customError={this.state.error}
+            customComponentStack={this.state.errorInfo?.componentStack}
+            requestedUrl={typeof window !== "undefined" ? window.location.pathname : "/"}
+          />
+        </BrowserRouter>
       );
     }
 

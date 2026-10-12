@@ -1,0 +1,66 @@
+name: Deploy Frontend to Hostinger
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: production-deployment
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy Frontend (dist/)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🏗️ Build Production Bundle (Vite)
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL || 'https://earshyogwe.com/api' }}
+          VITE_APP_NAME: "Anglican Church of Rwanda, Shyogwe Diocese"
+          VITE_APP_ENV: production
+        run: npm run build
+
+      - name: 🔍 Verify Build Output
+        run: |
+          if [ ! -f "dist/index.html" ]; then
+            echo "❌ Error: dist/index.html not generated!"
+            exit 1
+          fi
+          if [ ! -d "dist/assets" ]; then
+            echo "❌ Error: dist/assets folder not generated!"
+            exit 1
+          fi
+          # Ensure .htaccess exists for SPA routing
+          if [ ! -f "dist/.htaccess" ]; then
+            echo "⚠️ dist/.htaccess missing, copying from public/.htaccess"
+            cp public/.htaccess dist/.htaccess
+          fi
+          echo "✅ Production build successfully verified!"
+          ls -la dist
+
+      - name: 🚀 Sync dist/ to Hostinger public_html
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT || 21 }}
+          protocol: ${{ secrets.FTP_PROTOCOL || 'ftp' }}
+          local-dir: ./dist/
+          server-dir: ${{ secrets.FTP_REMOTE_ROOT || 'public_html/' }}
+          dangerous-clean-slate: false

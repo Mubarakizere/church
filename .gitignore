@@ -20,6 +20,9 @@ lerna-debug.log*
 # Build & Storage (recursive)
 **/dist/
 **/dist-ssr/
+*.zip
+deployment-*/
+hostinger-deployment/
 backend/public/storage
 backend/storage/*.key
 
