@@ -87,11 +87,21 @@ export const PartnersSection: React.FC = () => {
     }
   ];
 
-  // Helper function to resolve logo path
-  const resolveLogoUrl = (rawLogo?: string): string => {
-    if (!rawLogo) return "";
+  // Candidate URLs for reliable image loading across desktop, mobile, and CDN
+  const getLogoCandidates = (rawLogo?: string): string[] => {
+    if (!rawLogo) return [];
     const filename = rawLogo.split("/").pop() || rawLogo;
-    return apiUrls.storage(`partner-logos/${filename}`);
+    return [
+      `/storage/partner-logos/${filename}`,
+      `https://earshyogwe.com/storage/partner-logos/${filename}`,
+      `https://earshyogwe.com/api/storage/partner-logos/${filename}`,
+      `/partner-logos/${filename}`
+    ];
+  };
+
+  const resolveLogoUrl = (rawLogo?: string): string => {
+    const candidates = getLogoCandidates(rawLogo);
+    return candidates[0] || "";
   };
 
   // Fetch partners from API
@@ -128,7 +138,7 @@ export const PartnersSection: React.FC = () => {
     const scrollContainer = scrollRef.current;
     if (!scrollContainer) return;
 
-    let speed = 0.8; // pixels per frame
+    const speed = typeof window !== "undefined" && window.innerWidth < 640 ? 0.6 : 0.8;
 
     const step = () => {
       if (!isPaused && scrollContainer) {
@@ -155,24 +165,32 @@ export const PartnersSection: React.FC = () => {
   // User controls: scroll left or right
   const handleScroll = (direction: "left" | "right") => {
     if (!scrollRef.current) return;
-    const distance = 280;
+    const distance = 260;
     scrollRef.current.scrollBy({
       left: direction === "left" ? -distance : distance,
       behavior: "smooth"
     });
   };
 
-  const handleImageError = (partnerId: number, filename?: string) => {
-    if (filename) {
-      const cleanName = filename.split("/").pop();
-      const backupUrl = `https://earshyogwe.com/api/storage/partner-logos/${cleanName}`;
-      const imgElement = document.getElementById(`partner-img-${partnerId}`) as HTMLImageElement;
-      if (imgElement && imgElement.src !== backupUrl) {
-        imgElement.src = backupUrl;
-        return;
-      }
+  const handleImageError = (
+    e: React.SyntheticEvent<HTMLImageElement, Event>,
+    partnerId: number,
+    rawLogo?: string
+  ) => {
+    const img = e.currentTarget;
+    const candidates = getLogoCandidates(rawLogo);
+    const currentSrc = img.src;
+
+    // Try the next candidate in line that hasn't been used yet
+    const nextCandidate = candidates.find(
+      (c) => !currentSrc.endsWith(c) && !currentSrc.includes(c)
+    );
+
+    if (nextCandidate) {
+      img.src = nextCandidate;
+    } else {
+      setFailedImages((prev) => ({ ...prev, [partnerId]: true }));
     }
-    setFailedImages((prev) => ({ ...prev, [partnerId]: true }));
   };
 
   const getPartnerInitials = (name: string): string => {
@@ -187,10 +205,10 @@ export const PartnersSection: React.FC = () => {
   const displayPartners = [...partners, ...partners];
 
   return (
-    <section className="py-14 bg-white border-t border-slate-200/70 relative overflow-hidden select-none">
+    <section className="py-12 sm:py-14 bg-white border-t border-slate-200/70 relative overflow-hidden select-none">
       <div className="container mx-auto px-4">
         {/* Header with user controls */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
           <div>
             <h2 className="text-2xl sm:text-3xl font-serif font-bold text-church-navy tracking-tight">
               Our Partners
@@ -205,15 +223,15 @@ export const PartnersSection: React.FC = () => {
             <button
               onClick={() => handleScroll("left")}
               aria-label="Previous partners"
-              className="w-9 h-9 rounded-full bg-white border border-slate-200/90 shadow-xs flex items-center justify-center text-slate-700 hover:text-church-navy hover:bg-slate-100 active:scale-95 transition-all cursor-pointer"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white border border-slate-200/90 shadow-xs flex items-center justify-center text-slate-700 hover:text-church-navy hover:bg-slate-100 active:scale-95 transition-all cursor-pointer"
             >
-              <ChevronLeft className="h-5 w-5" />
+              <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
 
             <button
               onClick={() => setIsPaused((prev) => !prev)}
               aria-label={isPaused ? "Resume auto-scroll" : "Pause auto-scroll"}
-              className={`px-3 h-9 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+              className={`px-3 h-8 sm:h-9 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                 isPaused
                   ? "bg-church-navy text-white border-church-navy shadow-xs"
                   : "bg-white text-slate-600 border-slate-200/90 hover:bg-slate-100"
@@ -235,9 +253,9 @@ export const PartnersSection: React.FC = () => {
             <button
               onClick={() => handleScroll("right")}
               aria-label="Next partners"
-              className="w-9 h-9 rounded-full bg-white border border-slate-200/90 shadow-xs flex items-center justify-center text-slate-700 hover:text-church-navy hover:bg-slate-100 active:scale-95 transition-all cursor-pointer"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white border border-slate-200/90 shadow-xs flex items-center justify-center text-slate-700 hover:text-church-navy hover:bg-slate-100 active:scale-95 transition-all cursor-pointer"
             >
-              <ChevronRight className="h-5 w-5" />
+              <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           </div>
         </div>
@@ -247,19 +265,21 @@ export const PartnersSection: React.FC = () => {
           className="relative"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
+          onTouchStart={() => setIsPaused(true)}
+          onTouchEnd={() => setIsPaused(false)}
         >
-          {/* Edge fade gradients */}
-          <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-20 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-20 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+          {/* Subtle edge fade gradients on smaller screens */}
+          <div className="absolute left-0 top-0 bottom-0 w-6 sm:w-16 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-6 sm:w-16 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
 
           {loading ? (
-            <div className="h-28 flex items-center justify-center">
+            <div className="h-24 sm:h-28 flex items-center justify-center">
               <Loader2 className="h-6 w-6 animate-spin text-church-navy" />
             </div>
           ) : (
             <div
               ref={scrollRef}
-              className="flex items-center gap-5 overflow-x-auto scrollbar-none py-2 px-4 scroll-smooth"
+              className="flex items-center gap-3 sm:gap-5 overflow-x-auto scrollbar-none py-2 px-2 sm:px-4 scroll-smooth touch-pan-x"
               style={{
                 scrollbarWidth: "none",
                 msOverflowStyle: "none"
@@ -278,23 +298,21 @@ export const PartnersSection: React.FC = () => {
                       }
                     }}
                     title={partner.website ? `${partner.name} - Click to visit website` : partner.name}
-                    className="shrink-0 w-44 sm:w-52 h-24 sm:h-28 bg-white rounded-xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-church-gold/70 transition-all duration-300 flex items-center justify-center p-3 cursor-pointer group hover:-translate-y-1"
+                    className="shrink-0 w-36 sm:w-52 h-20 sm:h-28 bg-white rounded-xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-church-gold/70 transition-all duration-300 flex items-center justify-center p-2 sm:p-3 cursor-pointer group hover:-translate-y-0.5"
                   >
                     {!isFailed ? (
                       <img
-                        id={`partner-img-${partner.id}`}
                         src={logoSrc}
                         alt={partner.name}
-                        className="max-h-16 max-w-[85%] object-contain transition-transform duration-300 group-hover:scale-105"
-                        loading="lazy"
-                        onError={() => handleImageError(partner.id, partner.logo)}
+                        className="max-h-12 sm:max-h-16 max-w-[88%] object-contain transition-transform duration-300 group-hover:scale-105"
+                        onError={(e) => handleImageError(e, partner.id, partner.logo)}
                       />
                     ) : (
-                      <div className="flex items-center gap-2 px-2">
-                        <div className="w-8 h-8 rounded-lg bg-church-navy text-church-gold font-bold text-xs flex items-center justify-center shrink-0">
+                      <div className="flex items-center gap-2 px-1 sm:px-2">
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-church-navy text-church-gold font-bold text-[11px] sm:text-xs flex items-center justify-center shrink-0">
                           {getPartnerInitials(partner.name)}
                         </div>
-                        <span className="text-xs font-semibold text-church-navy line-clamp-1">
+                        <span className="text-[11px] sm:text-xs font-semibold text-church-navy line-clamp-1">
                           {partner.name}
                         </span>
                       </div>
