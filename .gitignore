@@ -21,6 +21,7 @@ lerna-debug.log*
 **/dist/
 **/dist-ssr/
 *.zip
+!frontend-dist.zip
 deployment-*/
 hostinger-deployment/
 backend/public/storage
