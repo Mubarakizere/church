@@ -5,7 +5,6 @@ import Bishop from "./pages/Bishop";
 import Projects from "./pages/Projects";
 import ProjectDetailPage from "./pages/ProjectDetailPage";
 import Donate from "./pages/Donate";
-import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import About from "./pages/About";
 import Services from "./pages/Services";
@@ -21,7 +20,6 @@ import NewsManagement from "./pages/admin/NewsManagement";
 import AdminMembers from "./pages/AdminMembers";
 import AdminPages from "./pages/AdminPages";
 import AdminAnalytics from "./pages/AdminAnalytics";
-import Login from "./pages/Login";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
 import TeamManagement from "./pages/admin/TeamManagement";
@@ -62,7 +60,7 @@ export const router = createBrowserRouter(
     { path: "/programs", element: <Navigate to="/projects" replace /> },
     { path: "/programs/:slug", element: <Projects /> },
     { path: "/donate", element: <Donate /> },
-    { path: "/dashboard", element: <Dashboard /> },
+    { path: "/dashboard", element: <Navigate to="/admin/dashboard" replace /> },
     { path: "/about", element: <About /> },
     { path: "/services", element: <Services /> },
     { path: "/events", element: <Events /> },
@@ -74,32 +72,37 @@ export const router = createBrowserRouter(
     { path: "/contact", element: <Contact /> },
     { path: "/schools", element: <Schools /> },
     { path: "/events/:id", element: <EventDetail /> },
-    { path: "/login", element: <Login /> },
-    { path: "/admin", element: <Navigate to="/admin/dashboard" replace /> },
+    { path: "/login", element: <Navigate to="/admin/login" replace /> },
     { path: "/admin/login", element: <AdminLogin /> },
-    { path: "/admin/dashboard", element: <AdminDashboard /> },
-    { path: "/admin/team", element: <TeamManagement /> },
-    { path: "/admin/services", element: <ServicesManagement /> },
-    { path: "/admin/hero-images", element: <HeroImagesManagement /> },
-    { path: "/admin/schools", element: <SchoolsManagement /> },
-    { path: "/admin/partners", element: <PartnersManagement /> },
-    { path: "/admin/health", element: <HealthManagement /> },
-    { path: "/admin/health/:id", element: <HealthDetail /> },
-    { path: "/admin/projects", element: <ProjectsOverview /> },
-    { path: "/admin/programs", element: <ProjectsManagement /> },
-    { path: "/admin/content", element: <ContentManagement /> },
-    { path: "/admin/events", element: <EventsManagement /> },
-    { path: "/admin/news", element: <NewsManagement /> },
-    { path: "/admin/gallery", element: <GalleryManagement /> },
-    { path: "/admin/documents", element: <DocumentsManagement /> },
-    { path: "/admin/secure-documents", element: <SecureDocumentsManagement /> },
-    { path: "/admin/secure-documents/:id/analytics", element: <SecureDocumentAnalytics /> },
-    { path: "/admin/change-password", element: <ChangePassword /> },
-    { path: "/admin/users", element: <UsersManagement /> },
-    { path: "/admin/settings", element: <SettingsManagement /> },
-    { path: "/admin/members", element: <AdminMembers /> },
-    { path: "/admin/pages", element: <AdminPages /> },
-    { path: "/admin/analytics", element: <AdminAnalytics /> },
+    {
+      element: <ProtectedRoute redirectTo="/admin/login" />,
+      children: [
+        { path: "/admin", element: <Navigate to="/admin/dashboard" replace /> },
+        { path: "/admin/dashboard", element: <AdminDashboard /> },
+        { path: "/admin/team", element: <TeamManagement /> },
+        { path: "/admin/services", element: <ServicesManagement /> },
+        { path: "/admin/hero-images", element: <HeroImagesManagement /> },
+        { path: "/admin/schools", element: <SchoolsManagement /> },
+        { path: "/admin/partners", element: <PartnersManagement /> },
+        { path: "/admin/health", element: <HealthManagement /> },
+        { path: "/admin/health/:id", element: <HealthDetail /> },
+        { path: "/admin/projects", element: <ProjectsOverview /> },
+        { path: "/admin/programs", element: <ProjectsManagement /> },
+        { path: "/admin/content", element: <ContentManagement /> },
+        { path: "/admin/events", element: <EventsManagement /> },
+        { path: "/admin/news", element: <NewsManagement /> },
+        { path: "/admin/gallery", element: <GalleryManagement /> },
+        { path: "/admin/documents", element: <DocumentsManagement /> },
+        { path: "/admin/secure-documents", element: <SecureDocumentsManagement /> },
+        { path: "/admin/secure-documents/:id/analytics", element: <SecureDocumentAnalytics /> },
+        { path: "/admin/change-password", element: <ChangePassword /> },
+        { path: "/admin/users", element: <UsersManagement /> },
+        { path: "/admin/settings", element: <SettingsManagement /> },
+        { path: "/admin/members", element: <AdminMembers /> },
+        { path: "/admin/pages", element: <AdminPages /> },
+        { path: "/admin/analytics", element: <AdminAnalytics /> },
+      ]
+    },
     { path: "/error", element: <ErrorShowcasePage /> },
     { path: "/error/:code", element: <ErrorPage /> },
     { path: "/400", element: <ErrorPage fixedCode="400" /> },

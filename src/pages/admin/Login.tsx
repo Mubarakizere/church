@@ -14,9 +14,6 @@ import {
   Church,
   ArrowLeft,
   AlertCircle,
-  Phone,
-  Info,
-  KeyRound,
   GraduationCap,
   Stethoscope,
   Building2
@@ -32,7 +29,7 @@ import {
 
 export const AdminLogin: React.FC = () => {
   const [credentials, setCredentials] = useState({
-    email: "admin@shyogwe.org",
+    email: "",
     password: ""
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -61,13 +58,6 @@ export const AdminLogin: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleFillAdminCredentials = () => {
-    setCredentials({
-      email: "admin@shyogwe.org",
-      password: "admin123"
-    });
   };
 
   return (
@@ -297,27 +287,6 @@ export const AdminLogin: React.FC = () => {
               )}
             </Button>
           </form>
-
-          {/* Admin Credentials Helper Box */}
-          <div className="mt-5 p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="font-semibold text-slate-800 flex items-center gap-1.5">
-                <KeyRound className="h-3.5 w-3.5 text-church-navy" />
-                Administrator Login Credentials
-              </span>
-              <button
-                type="button"
-                onClick={handleFillAdminCredentials}
-                className="text-[11px] font-bold text-church-navy hover:text-church-red underline"
-              >
-                Auto-fill
-              </button>
-            </div>
-            <div className="text-[11px] text-slate-600 space-y-0.5 font-mono">
-              <p>Email: <span className="text-slate-900 font-semibold">admin@shyogwe.org</span></p>
-              <p>Password: <span className="text-slate-900 font-semibold">admin123</span></p>
-            </div>
-          </div>
         </div>
 
         {/* Form Footer */}

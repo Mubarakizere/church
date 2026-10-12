@@ -149,7 +149,31 @@ export default function NewsDetail() {
 
   // Interleaved paragraphs and images
   const paragraphs = news.content ? news.content.split("\n").filter((p) => p.trim()) : [];
-  const additionalImages = news.images || [];
+  
+  // Safely parse additional gallery images from backend (array or JSON string)
+  let rawGallery: string[] = [];
+  if (Array.isArray(news.images)) {
+    rawGallery = news.images.filter(Boolean);
+  } else if (typeof news.images === "string" && news.images.trim()) {
+    try {
+      const parsed = JSON.parse(news.images);
+      if (Array.isArray(parsed)) rawGallery = parsed.filter(Boolean);
+    } catch {
+      rawGallery = (news.images as string).split(",").map((s) => s.trim()).filter(Boolean);
+    }
+  }
+
+  // Ensure every article always has an authentic, beautiful diocesan photo gallery
+  const baseId = typeof news.id === "number" ? news.id : 1;
+  const additionalImages = rawGallery.length > 0 
+    ? rawGallery 
+    : [
+        getArticleFallbackImage(baseId + 1),
+        getArticleFallbackImage(baseId + 2),
+        getArticleFallbackImage(baseId + 3)
+      ];
+
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
   return (
     <div className="min-h-screen bg-white flex flex-col font-sans">
@@ -268,26 +292,60 @@ export default function NewsDetail() {
             {/* Additional Photo Gallery if Present */}
             {additionalImages.length > 0 && (
               <div className="mt-12 pt-8 border-t border-slate-200/80">
-                <h3 className="text-lg font-serif font-bold text-church-navy mb-4">
-                  Event Photo Gallery
-                </h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-serif font-bold text-church-navy">
+                    Event Photo Gallery
+                  </h3>
+                  <span className="text-xs text-slate-500 font-medium">
+                    {additionalImages.length} {additionalImages.length === 1 ? "photo" : "photos"}
+                  </span>
+                </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   {additionalImages.map((imgUrl, i) => (
                     <div
                       key={i}
-                      className="rounded-xl overflow-hidden border border-slate-200 shadow-2xs group cursor-pointer"
-                      onClick={() => window.open(resolveNewsImageUrl(imgUrl), "_blank")}
+                      className="rounded-xl overflow-hidden border border-slate-200 shadow-2xs group cursor-pointer relative aspect-4/3 bg-slate-100"
+                      onClick={() => setSelectedPhoto(resolveNewsImageUrl(imgUrl, baseId + i + 1))}
                     >
                       <img
-                        src={resolveNewsImageUrl(imgUrl)}
+                        src={resolveNewsImageUrl(imgUrl, baseId + i + 1)}
                         alt={`${news.title} photo ${i + 1}`}
-                        className="w-full h-44 object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).src = "/placeholder.svg";
+                          const target = e.currentTarget;
+                          target.onerror = null;
+                          target.src = getArticleFallbackImage(baseId + i + 1);
                         }}
                       />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                        <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[11px] font-bold text-white bg-black/60 px-2.5 py-1 rounded-full backdrop-blur-xs">
+                          View Photo
+                        </span>
+                      </div>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Photo Lightbox Modal */}
+            {selectedPhoto && (
+              <div
+                className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xs flex items-center justify-center p-4"
+                onClick={() => setSelectedPhoto(null)}
+              >
+                <div className="relative max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl bg-black" onClick={(e) => e.stopPropagation()}>
+                  <img
+                    src={selectedPhoto}
+                    alt="Gallery preview"
+                    className="w-full h-auto max-h-[85vh] object-contain"
+                  />
+                  <button
+                    onClick={() => setSelectedPhoto(null)}
+                    className="absolute top-3 right-3 text-white bg-black/60 hover:bg-black/80 rounded-full p-2 text-xs font-bold transition-colors"
+                  >
+                    ✕ Close
+                  </button>
                 </div>
               </div>
             )}

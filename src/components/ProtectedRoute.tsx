@@ -1,11 +1,11 @@
 import { ReactNode } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
-  children: ReactNode;
+  children?: ReactNode;
   redirectTo?: string;
 }
 
@@ -30,11 +30,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, redirectTo })
 
   if (!isAuthenticated) {
     // Redirect to login page with return url
-    const to = redirectTo || '/login';
+    const to = redirectTo || '/admin/login';
     return <Navigate to={to} state={{ from: location }} replace />;
   }
 
-  return <>{children}</>;
+  return children ? <>{children}</> : <Outlet />;
 };
 
 export default ProtectedRoute;
