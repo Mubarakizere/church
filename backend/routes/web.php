@@ -13,6 +13,9 @@ Route::get('/test', function () {
     return response()->json(['message' => 'Laravel routing is working!']);
 });
 
+// Also include API routes so they match seamlessly under the /api symlink directory
+require __DIR__.'/api.php';
+
 // Route to serve storage files
 Route::get('/storage/{path}', function ($path) {
     $filePath = storage_path('app/public/' . $path);
