@@ -61,6 +61,7 @@ export default function NewsDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -172,8 +173,6 @@ export default function NewsDetail() {
         getArticleFallbackImage(baseId + 2),
         getArticleFallbackImage(baseId + 3)
       ];
-
-  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
   return (
     <div className="min-h-screen bg-white flex flex-col font-sans">
