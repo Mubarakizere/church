@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
@@ -13,11 +12,15 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        // Admin account for Shyogwe Diocese IT
+        // NOTE: Do NOT use Hash::make() here — the User model has a
+        // 'password' => 'hashed' cast that auto-hashes on assignment.
+        // Using Hash::make() would double-hash and break login.
         User::updateOrCreate(
-            ['email' => 'admin@shyogwe.org'],
+            ['email' => 'it@earshyogwe.com'],
             [
-                'name' => 'Diocesan Administrator',
-                'password' => Hash::make('Admin@Shyogwe2026'),
+                'name' => 'IT Administrator',
+                'password' => 'josue@09',
             ]
         );
     }

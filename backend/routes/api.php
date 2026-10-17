@@ -265,8 +265,7 @@ Route::prefix('admin')->group(function () {
     });
 });
 
-// Authentication (API) - login should return JSON token
-Route::post('login', [AuthController::class, 'login']);
+// Authentication (API) - handled by ApiAuthController routes above (lines 41-43)
 
 // Protected API routes (require Sanctum) - only write operations
 Route::middleware('auth:sanctum')->group(function () {
