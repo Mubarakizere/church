@@ -53,7 +53,7 @@ jobs:
           echo "✅ Production build successfully verified!"
           ls -la dist
 
-      - name: 🚀 Sync dist/ to Hostinger public_html
+      - name: 🚀 Sync dist/ to Web Root
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -62,5 +62,5 @@ jobs:
           port: ${{ secrets.FTP_PORT || 21 }}
           protocol: ${{ secrets.FTP_PROTOCOL || 'ftp' }}
           local-dir: ./dist/
-          server-dir: ${{ secrets.FTP_REMOTE_ROOT || 'public_html/' }}
+          server-dir: ${{ secrets.FTP_REMOTE_ROOT || './' }}
           dangerous-clean-slate: false
