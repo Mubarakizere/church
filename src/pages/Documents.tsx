@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import PasswordDialog from "@/components/PasswordDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { apiUrls } from "@/config/api";
+import { apiUrls, buildStorageUrl } from "@/config/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -291,8 +291,8 @@ export const Documents: React.FC = () => {
   const { user, token } = useAuth();
   const { toast } = useToast();
 
-  const [documents, setDocuments] = useState<DocumentRecord[]>(FALLBACK_DOCUMENTS);
-  const [loading, setLoading] = useState(false);
+  const [documents, setDocuments] = useState<DocumentRecord[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedFileType, setSelectedFileType] = useState<string>("all");
@@ -361,19 +361,40 @@ export const Documents: React.FC = () => {
               if (d.file.endsWith(".docx") || d.file.endsWith(".doc")) fileExt = "docx";
               else if (d.file.endsWith(".xlsx") || d.file.endsWith(".xls")) fileExt = "xlsx";
             }
+
+            let catKey: DocumentRecord["category"] = "pastoral";
+            let catLabel = "General Publications";
+            const rawCat = (d.category || "").toLowerCase();
+            if (rawCat.includes("policy") || rawCat.includes("governance") || rawCat.includes("gov")) {
+              catKey = "governance";
+              catLabel = "Policies & Governance";
+            } else if (rawCat.includes("pastoral") || rawCat.includes("synod")) {
+              catKey = "pastoral";
+              catLabel = "Pastoral & Synod";
+            } else if (rawCat.includes("liturg") || rawCat.includes("worship") || rawCat.includes("sacram")) {
+              catKey = "liturgical";
+              catLabel = "Liturgical & Sacraments";
+            } else if (rawCat.includes("form") || rawCat.includes("report") || rawCat.includes("admin")) {
+              catKey = "forms";
+              catLabel = "Parish Forms & Reports";
+            } else if (rawCat.includes("school") || rawCat.includes("health") || rawCat.includes("edu")) {
+              catKey = "education";
+              catLabel = "Education & Health";
+            }
+
             liveList.push({
               id: `std-${d.id}`,
               title: d.title,
-              refCode: `EAR-DOC-${d.id}`,
-              description: "Official diocesan document and publication.",
-              category: "pastoral",
-              categoryLabel: "General Publications",
+              refCode: `EAR-DOC-${d.id.toString().padStart(3, "0")}`,
+              description: d.description || "Official diocesan document and publication.",
+              category: catKey,
+              categoryLabel: catLabel,
               fileType: fileExt,
-              fileSize: "Document File",
+              fileSize: d.file_size || "Document File",
               publishedDate: d.created_at ? new Date(d.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short" }) : "Recent",
               issuingAuthority: "Diocesan Secretariat",
               accessLevel: "public",
-              downloadUrl: typeof d.file === "string" ? d.file : undefined,
+              downloadUrl: typeof d.file === "string" ? buildStorageUrl(d.file) : undefined,
               isApiDoc: true
             });
           }
@@ -381,8 +402,7 @@ export const Documents: React.FC = () => {
       }
 
       if (liveList.length > 0) {
-        // Prepend live API items before fallback catalog
-        setDocuments([...liveList, ...FALLBACK_DOCUMENTS]);
+        setDocuments(liveList);
       } else {
         setDocuments(FALLBACK_DOCUMENTS);
       }
@@ -771,7 +791,12 @@ Phone: +250 788 522 174 / +250 788 352 144
             </div>
 
             {/* Document Cards */}
-            {filteredDocuments.length === 0 ? (
+            {loading ? (
+              <div className="py-20 text-center">
+                <div className="w-10 h-10 border-2 border-church-gold border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-sm font-semibold text-slate-500">Loading diocesan publications...</p>
+              </div>
+            ) : filteredDocuments.length === 0 ? (
               <div className="bg-white rounded-xl border border-slate-200 p-12 text-center max-w-lg mx-auto shadow-sm my-8">
                 <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4 text-slate-400">
                   <FileText className="h-6 w-6" />
